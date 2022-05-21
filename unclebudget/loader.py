@@ -1,35 +1,33 @@
 from importlib import import_module
+from io import StringIO
 
 from django.conf import settings
+
+from .models import Charge, Load
 
 
 class LoadException(Exception):
     pass
 
 
-def load(file):
-    if isinstance(file, str):
-        file = open(file)
-
+def load(account, text):
     charges = None
-    with file:
-        text = file.read()
-        for loader in settings.UNCLEBUDGET_LOADERS:
-            file.seek(0)
-            try:
-                charges = import_module(loader).load(file)
-            except Exception as e:
-                pass
+
+    for loader in settings.UNCLEBUDGET_LOADERS:
+        try:
+            charges = import_module(loader).load(StringIO(text))
+        except Exception as e:
+            pass
 
     if charges == None:
-        raise LoadException(f'No loaders successful for file {file}')
+        raise LoadException(f'No loaders successful')
     
-    # TODO actual account
-    account = Account(name='dummy')
-    account.save()
+    load = Load(loader=loader, text=text, user=account.user)
     load.save()
-    load = Load(loader=loader, text=text)
     for charge in charges:
         charge.account = account
         charge.load = load
+        charge.user = account.user
         charge.save()
+
+    return charges
