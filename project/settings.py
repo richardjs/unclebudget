@@ -126,4 +126,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 UNCLEBUDGET_LOADERS = [
     'loaders.first',
+    'loaders.second',
 ]

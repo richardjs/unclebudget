@@ -16,7 +16,8 @@ def load(account, text):
     for loader in settings.UNCLEBUDGET_LOADERS:
         try:
             charges = import_module(loader).load(StringIO(text))
-        except Exception as e:
+            break
+        except Exception:
             pass
 
     if charges == None:
