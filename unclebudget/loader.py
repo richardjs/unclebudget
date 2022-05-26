@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.conf import settings
 
-from .models import Charge, Load
+from .models import Entry, Load
 
 
 class LoadException(Exception):

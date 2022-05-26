@@ -1,21 +1,21 @@
 from csv import DictReader
 from datetime import datetime
 
-from unclebudget.models import Charge
+from unclebudget.models import Entry
 
 
 def load(file):
-    charges = []
+    entries = []
     for row in DictReader(file):
         if row['Description'] == 'Daily Ledger Bal':
             continue
         if row['Description'].startswith('Pending:'):
             continue
 
-        charges.append(Charge(
+        entries.append(Entry(
             amount = -float(row['Amount']),
             date = datetime.strptime(row['Date'], '%m/%d/%Y').date(),
             description = row['Description'],
         ))
 
-    return charges
+    return entries

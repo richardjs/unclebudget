@@ -6,8 +6,16 @@ class Account(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    @property
+    def balance(self):
+        balance = 0
+        for entry in self.entry_set.all():
+            balance += entry.amount
 
-class Charge(models.Model):
+        return -balance
+
+
+class Entry(models.Model):
     account = models.ForeignKey('Account', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField()
