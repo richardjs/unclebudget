@@ -1,0 +1,13 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Accounts{% endblock %}
+
+{% block 'content' %}
+
+<h1>Accounts</h1>
+
+{% for account in object_list %}
+{{ account.name }}
+{% endfor %}
+
+{% endblock %}

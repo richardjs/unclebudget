@@ -1,0 +1,13 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Envelopes{% endblock %}
+
+{% block 'content' %}
+
+<h1>Envelopes</h1>
+
+{% for envelope in object_list %}
+{{ envelope.name }}
+{% endfor %}
+
+{% endblock %}

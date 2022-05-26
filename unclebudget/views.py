@@ -1,3 +1,20 @@
-from django.shortcuts import render
+from django.views.generic import *
+from django.http import HttpResponse
 
-# Create your views here.
+from unclebudget.models import *
+
+
+class AccountDetail(DetailView):
+    model = Account
+
+
+class AccountList(ListView):
+    model = Account
+
+
+class EnvelopeDetail(DetailView):
+    model = Envelope
+
+
+class EnvelopeList(ListView):
+    model = Envelope
