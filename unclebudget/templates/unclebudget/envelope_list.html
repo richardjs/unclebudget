@@ -6,8 +6,12 @@
 
 <h1>Envelopes</h1>
 
+<ul>
 {% for envelope in object_list %}
-{{ envelope.name }}
+    <li>
+        {{ envelope.name }} ${{ envelope.balance }}
+    </li>
 {% endfor %}
+</li>
 
 {% endblock %}

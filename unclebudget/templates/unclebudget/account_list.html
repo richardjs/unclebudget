@@ -6,8 +6,10 @@
 
 <h1>Accounts</h1>
 
+<ul>
 {% for account in object_list %}
-{{ account.name }}
+    <li>{{ account.name }} ${{ account.balance }}</li>
 {% endfor %}
+</ul>
 
 {% endblock %}
