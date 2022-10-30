@@ -8,7 +8,9 @@
 
 <ul>
 {% for account in object_list %}
-    <li>{{ account.name }} ${{ account.balance }}</li>
+    <li>
+        <a href="{% url 'accounts-list' account.id %}">{{ account.name }}</a>
+        ${{ account.balance }}</li>
 {% endfor %}
 </ul>
 
