@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from datetime import date, datetime
+from os import environ
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -128,3 +130,12 @@ UNCLEBUDGET_LOADERS = [
     'loaders.first',
     'loaders.second',
 ]
+
+
+# UB will never import transactions before this date
+if 'UNCLEBUDGET_DAWN_OF_TIME' in environ:
+    UNCLEBUDGET_DAWN_OF_TIME = datetime.strptime(
+        environ['UNCLEBUDGET_DAWN_OF_TIME'], '%m/%d/%y'
+    ).date()
+else:
+    UNCLEBUDGET_DAWN_OF_TIME = date(1970, 1, 1)
