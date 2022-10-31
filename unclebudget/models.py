@@ -6,6 +6,9 @@ class Account(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    initial_balance = models.DecimalField(max_digits=9, decimal_places=2)
+    start_date = models.DateField()
+
     @property
     def balance(self):
         balance = 0

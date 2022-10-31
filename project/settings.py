@@ -130,12 +130,3 @@ UNCLEBUDGET_LOADERS = [
     'loaders.first',
     'loaders.second',
 ]
-
-
-# UB will never import transactions before this date
-if 'UNCLEBUDGET_DAWN_OF_TIME' in environ:
-    UNCLEBUDGET_DAWN_OF_TIME = datetime.strptime(
-        environ['UNCLEBUDGET_DAWN_OF_TIME'], '%m/%d/%y'
-    ).date()
-else:
-    UNCLEBUDGET_DAWN_OF_TIME = date(1970, 1, 1)

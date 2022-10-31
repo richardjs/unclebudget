@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -14,7 +15,10 @@ class LoaderTestCase(TestCase):
         self.user = User.objects.get()
         self.client.login(username='testuser', password='password')
 
-        self.account = Account(name='Test', user=self.user)
+        self.account = Account(
+            name='Test', user=self.user,
+            initial_balance=0.0, start_date=datetime(1970, 1, 1).date()
+        )
         self.account.save()
 
     def test_first_loader(self):
@@ -55,7 +59,10 @@ class ModelsTestCase(TestCase):
         self.user = User.objects.get()
         self.client.login(username='testuser', password='password')
 
-        self.account = Account(name='Test', user=self.user)
+        self.account = Account(
+            name='Test', user=self.user,
+            initial_balance=0.0, start_date=datetime(1970, 1, 1).date()
+        )
         self.account.save()
 
         csv = '''"Date","Description","Amount"

@@ -26,7 +26,7 @@ def load(account, text):
     load = Load(loader=loader, text=text, user=account.user)
     load.save()
     for charge in charges:
-        if charge.date < settings.UNCLEBUDGET_DAWN_OF_TIME:
+        if charge.date < account.start_date:
             continue
 
         charge.account = account
