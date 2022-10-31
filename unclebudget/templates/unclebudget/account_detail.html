@@ -6,4 +6,18 @@
 
 <h1>{{ account.name }}</h1>
 
+<h2>${{ account.balance }}</h2>
+
+<h3>Entries</h3>
+
+<table>
+{% for entry in account.entry_set.all %}
+    <tr>
+        <td>{{ entry.date|date:"m/d/y" }}</td>
+        <td>{{ entry.amount }}</td>
+        <td>{{ entry.description }}</td>
+    </tr>
+{% endfor %}
+</table>
+
 {% endblock %}
