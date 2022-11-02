@@ -32,9 +32,8 @@ class Entry(models.Model):
         on_delete=models.CASCADE,
     )
     receipt = models.ForeignKey(
-        'self',
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
+        'Receipt',
+        on_delete=models.PROTECT,
     )
     transfer_to = models.OneToOneField(
         'self',
@@ -115,6 +114,10 @@ class Load(models.Model):
 
 class Receipt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    @property
+    def balanced(self):
+        pass
 
     def __str__(self):
         return f'#{self.id}'

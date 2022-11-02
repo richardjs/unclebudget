@@ -74,3 +74,6 @@ class ModelsTestCase(TestCase):
 
     def test_account_balance(self):
         self.assertEquals(self.account.balance, Decimal('902.92'))
+
+    def test_receipts_created(self):
+        self.assertEquals(len(Receipt.objects.all()), 4)

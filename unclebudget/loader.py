@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.conf import settings
 
-from .models import Entry, Load
+from .models import Load, Receipt
 
 
 class LoadException(Exception):
@@ -29,9 +29,14 @@ def load(account, text):
         if charge.date < account.start_date:
             continue
 
+        receipt = Receipt()
+        receipt.user = account.user
+        receipt.save()
+
         charge.account = account
         charge.load = load
         charge.user = account.user
+        charge.receipt = receipt
         charge.save()
 
     return charges
