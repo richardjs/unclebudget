@@ -117,7 +117,12 @@ class Receipt(models.Model):
 
     @property
     def balanced(self):
-        pass
+        return (sum([entry.amount for entry in self.entry_set.all()]) ==
+            sum([item.amount for item in self.item_set.all()]))
+
+    @property
+    def date(self):
+        return self.entry_set.first().date
 
     def __str__(self):
         return f'#{self.id}'

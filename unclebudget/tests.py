@@ -60,7 +60,7 @@ class ModelsTestCase(TestCase):
         self.client.login(username='testuser', password='password')
 
         self.account = Account(
-            name='Test', user=self.user,
+            name='Test Account', user=self.user,
             initial_balance=0.0, start_date=datetime(1970, 1, 1).date()
         )
         self.account.save()
@@ -72,8 +72,33 @@ class ModelsTestCase(TestCase):
 01/9/2021,"PAYCHECK",1000.00'''
         entries = load(self.account, csv)
 
+        self.envelope = Envelope(
+            name='Test Envelope', user=self.user,
+        )
+        self.envelope.save()
+
+        for entry in entries:
+            item = Item(
+                user=entry.user,
+                amount=entry.amount,
+                description=entry.description,
+                envelope=self.envelope,
+                receipt=entry.receipt,
+            )
+            item.save()
+
     def test_account_balance(self):
         self.assertEquals(self.account.balance, Decimal('902.92'))
 
     def test_receipts_created(self):
         self.assertEquals(len(Receipt.objects.all()), 4)
+
+    def test_receipts_balanced(self):
+        for receipt in Receipt.objects.all():
+            self.assertTrue(receipt.balanced)
+
+        receipt = Receipt.objects.first()
+        item = receipt.item_set.first()
+        item.amount = item.amount + 1
+        item.save()
+        self.assertFalse(receipt.balanced)
