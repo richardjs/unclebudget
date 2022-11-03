@@ -1,0 +1,92 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Process receipts{% endblock %}
+
+{% block 'content' %}
+
+<form method="post">
+{% csrf_token %}
+
+<p>
+    {{ receipt.date }} &mdash;
+    <input value="${{ receipt.amount }}" />
+</p>
+
+<h2>Account entries</h2>
+
+<table>
+    <th>Account</th>
+    <th>Amount</th>
+    <th>Description</th>
+    <th>Transfer</th>
+
+    {% for entry in receipt.entry_set.all %}
+    <tr>
+        <td>
+            <select>
+                <option>{{ entry.account }}</option>
+            </select>
+        </td>
+        <td><input value="{{ entry.amount }}" /></td>
+        <td><input value="{{ entry.description }}"</td>
+        <td>
+            <select>
+                <option>{{ entry.transfer_to }}</option>
+            </select>
+        </td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+        <td>
+            <select>
+                <option></option>
+            </select>
+        </td>
+        <td><input type="number" value="{{ entry.amount }}" /></td>
+        <td><input value="{{ entry.description }}"</td>
+        <td>
+            <select>
+                <option></option>
+            </select>
+        </td>
+    </tr>
+</table>
+
+<h2>Envelope items</h2>
+
+<table>
+    <th>Envelope</th>
+    <th>Amount</th>
+    <th>Description</th>
+
+    {% for item in receipt.item_set.all %}
+    <tr>
+        <td>
+            <select>
+                <option>{{ item.envelope }}</option>
+            </select>
+        </td>
+        <td><input type="number" value="{{ item.amount }}" /></td>
+        <td><input value="{{ item.description }}"</td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+        <td>
+            <select>
+                <option></option>
+            </select>
+        </td>
+        <td><input type="number" value="{{ entry.amount }}" /></td>
+        <td><input value="{{ entry.description }}"</td>
+    </tr>
+</table>
+
+<p>
+    <input type="submit" value="Update">
+</p>
+
+</form>
+
+{% endblock %}

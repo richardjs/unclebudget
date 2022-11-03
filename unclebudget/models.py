@@ -116,6 +116,10 @@ class Receipt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     @property
+    def amount(self):
+        return sum([entry.amount for entry in self.entry_set.all()])
+
+    @property
     def balanced(self):
         return (sum([entry.amount for entry in self.entry_set.all()]) ==
             sum([item.amount for item in self.item_set.all()]))

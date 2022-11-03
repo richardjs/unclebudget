@@ -1,5 +1,6 @@
 from django.views.generic import *
 from django.http import HttpResponse
+from django.shortcuts import render
 
 from unclebudget.models import *
 
@@ -32,6 +33,4 @@ def process_receipt(request):
         if not receipt or receipt.date > r.date:
             receipt = r
 
-    # TODO present a form to the user to add items to the receipt
-
-    return HttpResponse(str(receipt))
+    return render(request, 'unclebudget/process.html', locals())
