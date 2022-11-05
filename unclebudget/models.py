@@ -113,11 +113,8 @@ class Load(models.Model):
 
 
 class Receipt(models.Model):
+    amount = models.DecimalField(max_digits=9, decimal_places=2)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    @property
-    def amount(self):
-        return sum([entry.amount for entry in self.entry_set.all()])
 
     @property
     def balanced(self):

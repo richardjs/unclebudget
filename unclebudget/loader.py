@@ -30,13 +30,14 @@ def load(account, text):
             continue
 
         receipt = Receipt()
+        receipt.amount = charge.amount
         receipt.user = account.user
         receipt.save()
 
         charge.account = account
         charge.load = load
-        charge.user = account.user
         charge.receipt = receipt
+        charge.user = account.user
         charge.save()
 
     return charges
