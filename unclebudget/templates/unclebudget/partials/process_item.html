@@ -1,9 +1,17 @@
 <tr>
     <td>
         <select>
-            <option>{{ item.envelope }}</option>
+        {% if not entry %}
+            <option value="" selected></option>
+        {% endif %}
+        {% for envelope in envelopes %}
+            <option
+                value="{{ envelope.id }}"
+                {% if envelope == item.envelope %}selected{% endif %}
+            >{{ envelope.name }}</option>
+        {% endfor %}
         </select>
     </td>
-    <td><input name="item_amount" type="number" value="{{ item.amount }}" /></td>
+    <td>$<input type="number" step=".01" name="item_amount" type="number" value="{{ item.amount }}" /></td>
     <td><input name="item_description" value="{{ item.description }}"</td>
 </tr>

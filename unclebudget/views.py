@@ -30,4 +30,11 @@ def process_receipt(request):
     if not receipt:
         return HttpResponse('All receipts balanced')
 
-    return render(request, 'unclebudget/process.html', locals())
+    accounts = Account.objects.filter(user=request.user)
+    envelopes = Envelope.objects.filter(user=request.user)
+
+    return render(request, 'unclebudget/process.html', {
+        'receipt': receipt,
+        'accounts': accounts,
+        'envelopes': envelopes,
+    })
