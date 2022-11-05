@@ -25,6 +25,8 @@ def load(account, text):
     
     load = Load(loader=loader, text=text, user=account.user)
     load.save()
+
+    entries = []
     for charge in charges:
         if charge.date < account.start_date:
             continue
@@ -40,4 +42,6 @@ def load(account, text):
         charge.user = account.user
         charge.save()
 
-    return charges
+        entries.append(charge)
+
+    return entries
