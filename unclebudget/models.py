@@ -51,6 +51,10 @@ class Entry(models.Model):
         else:
             return f'(${-self.amount})'
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.receipt.save()
+
     def __str__(self):
         return f'{self.date} {self.amount_str} {self.description}'
 
@@ -98,6 +102,10 @@ class Item(models.Model):
     def date(self):
         return self.receipt.entry_set.first().date
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.receipt.save()
+
     def __str__(self):
         return f'{self.date} {self.amount_str} {self.description}'
 
@@ -114,16 +122,20 @@ class Load(models.Model):
 
 class Receipt(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
+    balanced = models.BooleanField()
+    date = models.DateField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    @property
-    def balanced(self):
-        return (sum([entry.amount for entry in self.entry_set.all()]) ==
-            sum([item.amount for item in self.item_set.all()]))
+    def save(self, *args, **kwargs):
+        self.balanced = (
+            sum([entry.amount for entry in self.entry_set.all()]) ==
+            sum([item.amount for item in self.item_set.all()])
+        )
+        first_entry = self.entry_set.first()
+        if first_entry:
+            self.date = first_entry.date
 
-    @property
-    def date(self):
-        return self.entry_set.first().date
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'#{self.id}'
