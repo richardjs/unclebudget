@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.urls import reverse
 
 from .loader import load
 from .models import *
@@ -113,3 +114,16 @@ class ModelsTestCase(TestCase):
         item.amount = item.amount + 1
         item.save()
         self.assertFalse(receipt.balanced)
+
+    def test_process_receipt(self):
+        response = self.client.get(reverse('process_receipt'))
+
+        # Everything is balanced in initial conditions
+        self.assertIsNone(response.context)
+
+        item = Item.objects.first()
+        item.amount = item.amount + 1
+        item.save()
+        response = self.client.get(reverse('process_receipt'))
+        self.assertEquals(response.context['receipt'], item.receipt)
+

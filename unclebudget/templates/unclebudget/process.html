@@ -7,10 +7,10 @@
 <form method="post">
 {% csrf_token %}
 
-<p>
+<h1>
     {{ receipt.date }} &mdash;
-    <input value="${{ receipt.amount }}" />
-</p>
+    ${{ receipt.amount }}
+</h1>
 
 <h2>Account entries</h2>
 
@@ -21,36 +21,9 @@
     <th>Transfer</th>
 
     {% for entry in receipt.entry_set.all %}
-    <tr>
-        <td>
-            <select>
-                <option>{{ entry.account }}</option>
-            </select>
-        </td>
-        <td><input value="{{ entry.amount }}" /></td>
-        <td><input value="{{ entry.description }}"</td>
-        <td>
-            <select>
-                <option>{{ entry.transfer_to }}</option>
-            </select>
-        </td>
-    </tr>
+        {% include './partials/process_entry.html' %}
     {% endfor %}
-
-    <tr>
-        <td>
-            <select>
-                <option></option>
-            </select>
-        </td>
-        <td><input type="number" value="{{ entry.amount }}" /></td>
-        <td><input value="{{ entry.description }}"</td>
-        <td>
-            <select>
-                <option></option>
-            </select>
-        </td>
-    </tr>
+    {% include './partials/process_entry.html' %}
 </table>
 
 <h2>Envelope items</h2>
@@ -61,26 +34,9 @@
     <th>Description</th>
 
     {% for item in receipt.item_set.all %}
-    <tr>
-        <td>
-            <select>
-                <option>{{ item.envelope }}</option>
-            </select>
-        </td>
-        <td><input type="number" value="{{ item.amount }}" /></td>
-        <td><input value="{{ item.description }}"</td>
-    </tr>
+        {% include './partials/process_item.html' %}
     {% endfor %}
-
-    <tr>
-        <td>
-            <select>
-                <option></option>
-            </select>
-        </td>
-        <td><input type="number" value="{{ entry.amount }}" /></td>
-        <td><input value="{{ entry.description }}"</td>
-    </tr>
+    {% include './partials/process_item.html' %}
 </table>
 
 <p>

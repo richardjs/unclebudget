@@ -22,15 +22,12 @@ class EnvelopeList(ListView):
 
 
 def process_receipt(request):
-    # TODO this can be way optimized (e.g. cache balanced and date,
-    # and do it all on DB level)
+    receipt = Receipt.objects.filter(
+        user=request.user,
+        balanced=False
+    ).order_by('date').first()
 
-    receipt = None
-    for r in Receipt.objects.filter(user=request.user):
-        if r.balanced:
-            continue
-
-        if not receipt or receipt.date > r.date:
-            receipt = r
+    if not receipt:
+        return HttpResponse('All receipts balanced')
 
     return render(request, 'unclebudget/process.html', locals())
