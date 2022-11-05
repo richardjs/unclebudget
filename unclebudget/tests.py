@@ -51,6 +51,17 @@ class LoaderTestCase(TestCase):
         entries = load(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 4)
 
+    def test_receipt_amounts_equals_charge_amounts(self):
+        csv = '''Transaction Date,Post Date,Transaction Detail,Amount
+2021-01-20,2021-01-20,SUPER SUSHI,10.10
+2021-01-19,2021-01-20,WAYOUT,300.20
+2021-01-19,2021-01-20,ZAXDEE,8.30
+2021-01-22,2021-01-22,GROVERS GROCERY,35.50
+2021-02-04,2021-02-04,PAYMENT,-354.10'''
+        entries = load(self.account, csv)
+        for entry in entries:
+            self.assertEquals(entry.amount, entry.receipt.amount)
+
 
 class ModelsTestCase(TestCase):
     def setUp(self):
