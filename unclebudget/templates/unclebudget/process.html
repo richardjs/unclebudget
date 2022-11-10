@@ -19,10 +19,14 @@
     <th>Amount</th>
     <th>Description</th>
 
+
     {% for entry in receipt.entry_set.all %}
-        {% include './partials/process_entry.html' %}
+        <tr>
+            <td>{{ entry.account.name }}</td>
+            <td>${{ entry.amount }}</td>
+            <td>{{ entry.description }}</td>
+        </tr>
     {% endfor %}
-    {% include './partials/process_entry.html' %}
 </table>
 
 <h2>Envelope items</h2>
