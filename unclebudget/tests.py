@@ -116,7 +116,7 @@ class ModelsTestCase(TestCase):
         self.assertFalse(receipt.balanced)
 
     def test_process_receipt(self):
-        response = self.client.get(reverse('process_receipt'))
+        response = self.client.get(reverse('process'))
 
         # Everything is balanced in initial conditions
         self.assertIsNone(response.context)
@@ -124,6 +124,6 @@ class ModelsTestCase(TestCase):
         item = Item.objects.first()
         item.amount = item.amount + 1
         item.save()
-        response = self.client.get(reverse('process_receipt'))
+        response = self.client.get(reverse('process'), follow=True)
         self.assertEquals(response.context['receipt'], item.receipt)
 

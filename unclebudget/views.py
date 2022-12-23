@@ -1,6 +1,6 @@
 from django.views.generic import *
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from unclebudget.models import *
 
@@ -21,7 +21,7 @@ class EnvelopeList(ListView):
     model = Envelope
 
 
-def process_receipt(request):
+def process(request):
     receipt = Receipt.objects.filter(
         user=request.user,
         balanced=False
@@ -30,6 +30,11 @@ def process_receipt(request):
     if not receipt:
         return HttpResponse('All receipts balanced')
 
+    return redirect('receipt', receipt.pk)
+
+
+def receipt(request, pk):
+    receipt = Receipt.objects.get(user=request.user, pk=pk)
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
 

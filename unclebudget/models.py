@@ -127,6 +127,12 @@ class Receipt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        if self.pk == None:
+            # We need to save it before we can run the calculations below
+            # balanced is required, so set it temporarily
+            self.balanced = True
+            super().save(*args, **kwargs)
+
         self.balanced = (
             sum([entry.amount for entry in self.entry_set.all()]) ==
             sum([item.amount for item in self.item_set.all()])
