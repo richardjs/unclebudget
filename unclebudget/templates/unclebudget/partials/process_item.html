@@ -1,6 +1,7 @@
 <tr>
+    <input type="hidden" name="item_id" value="{{ item.id }}" />
     <td>
-        <select>
+        <select name="item_envelope">
         {% if not entry %}
             <option value="" selected></option>
         {% endif %}
@@ -13,5 +14,5 @@
         </select>
     </td>
     <td>$<input type="number" step=".01" name="item_amount" type="number" value="{{ item.amount }}" /></td>
-    <td><input name="item_description" value="{{ item.description }}"</td>
+    <td><input name="item_description" value="{{ item.description }}" /></td>
 </tr>

@@ -1,6 +1,8 @@
+from decimal import Decimal
+
 from django.views.generic import *
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from unclebudget.models import *
 
@@ -34,7 +36,35 @@ def process(request):
 
 
 def receipt(request, pk):
-    receipt = Receipt.objects.get(user=request.user, pk=pk)
+    receipt = get_object_or_404(Receipt, user=request.user, pk=pk)
+
+    if request.method == 'POST':
+        for item_id, envelope_id, amount, description in zip(
+            request.POST.getlist('item_id'),
+            request.POST.getlist('item_envelope'),
+            request.POST.getlist('item_amount'),
+            request.POST.getlist('item_description'),
+        ):
+            if not envelope_id:
+                if item_id:
+                    item = get_object_or_404(Item, pk=item_id, user=request.user)
+                    item.delete()
+                continue
+
+            envelope = get_object_or_404(Envelope, user=request.user, pk=envelope_id)
+
+            if item_id:
+                item = get_object_or_404(Item, user=request.user, pk=item_id)
+            else:
+                item = Item()
+
+            item.amount = Decimal(amount)
+            item.description = description
+            item.envelope = envelope
+            item.receipt = receipt
+            item.user = request.user
+            item.save()
+
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
 

@@ -77,6 +77,8 @@ class Envelope(models.Model):
         return -balance
 
     def __str__(self):
+        if self.parent:
+            return f'{self.parent}: {self.name}'
         return f'{self.name}'
 
 
