@@ -104,6 +104,10 @@ class Item(models.Model):
     def date(self):
         return self.receipt.entry_set.first().date
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.receipt.save()
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.receipt.save()

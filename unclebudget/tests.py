@@ -140,3 +140,14 @@ class ModelsTestCase(TestCase):
         # Receipt should be balanced now
         response = self.client.get(reverse('process'), follow=True)
         self.assertIsNone(response.context)
+
+    def test_changing_item_changes_receipt_balance(self):
+        item = Item.objects.first()
+        item.amount += 1
+        item.save()
+        self.assertFalse(item.receipt.balanced)
+        item.amount -= 1
+        item.save()
+        self.assertTrue(item.receipt.balanced)
+        item.delete()
+        self.assertFalse(item.receipt.balanced)
