@@ -8,9 +8,11 @@
 {% csrf_token %}
 
 <h1>
-    {{ receipt.date }} &mdash;
+    {{ receipt.date }}
     ${{ receipt.amount }}
 </h1>
+
+<h2>Balance: ${{ receipt.balance }}</p>
 
 <h2>Account entries</h2>
 
@@ -18,7 +20,6 @@
     <th>Account</th>
     <th>Amount</th>
     <th>Description</th>
-
 
     {% for entry in receipt.entry_set.all %}
         <tr>

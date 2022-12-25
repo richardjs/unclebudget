@@ -6,4 +6,23 @@
 
 <h1>{{ envelope.name }}</h1>
 
+<table>
+    <thead>
+        <th>Amount</th>
+        <th>Description</th>
+        <th>Receipt</th>
+    </thead>
+    {% for item in envelope.item_set.all %}
+        <tr>
+            <td>${{ item.amount }}</td>
+            <td>{{ item.description }}</td>
+            <td>
+                <a href="{% url 'receipt' item.receipt.id %}">
+                    {{ item.receipt.date }}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}

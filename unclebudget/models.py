@@ -144,8 +144,8 @@ class Receipt(models.Model):
             super().save(*args, **kwargs)
 
         self.balance = (
-            sum([item.amount for item in self.item_set.all()]) -
-            sum([entry.amount for entry in self.entry_set.all()])
+            sum([entry.amount for entry in self.entry_set.all()]) -
+            sum([item.amount for item in self.item_set.all()])
         )
         first_entry = self.entry_set.first()
         if first_entry:

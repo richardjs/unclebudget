@@ -6,8 +6,9 @@
     </head>
     <body>
         <p>
-            <a href="/envelopes">Envelopes</a>
-            <a href="/accounts">Accounts</a>
+            <a href="{% url 'envelope-list' %}">Envelopes</a>
+            <a href="{% url 'account-list' %}">Accounts</a>
+            <a href="{% url 'process' %}">Process</a>
             <a href="/admin">Admin</a>
         </p>
         {% block 'content' %}
