@@ -121,9 +121,22 @@ class ModelsTestCase(TestCase):
         # Everything is balanced in initial conditions
         self.assertIsNone(response.context)
 
+        # Unbalance the receipt
         item = Item.objects.first()
         item.amount = item.amount + 1
         item.save()
+        # Process URL should take you to the page for the receipt
         response = self.client.get(reverse('process'), follow=True)
         self.assertEquals(response.context['receipt'], item.receipt)
 
+        # Rebalance the receipt with the web interface
+        self.client.post(reverse('receipt', kwargs={'pk': item.receipt.id}), {
+            'item_id': item.id,
+            'item_envelope': item.envelope.id,
+            'item_amount': item.amount - 1,
+            'item_description': '',
+        })
+
+        # Receipt should be balanced now
+        response = self.client.get(reverse('process'), follow=True)
+        self.assertIsNone(response.context)

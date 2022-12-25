@@ -1,8 +1,9 @@
 from decimal import Decimal
 
-from django.views.generic import *
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic import *
 
 from unclebudget.models import *
 
@@ -25,8 +26,8 @@ class EnvelopeList(ListView):
 
 def process(request):
     receipt = Receipt.objects.filter(
+        ~Q(balance=0),
         user=request.user,
-        balanced=False
     ).order_by('date').first()
 
     if not receipt:
