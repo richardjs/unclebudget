@@ -1,17 +1,24 @@
+{% load static %}
+
 <!doctype html>
 <html>
     <head>
         <meta charset="utf-8">
         <title>{% block 'title' %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'unclebudget/css/bootstrap.min.css' %}" />
     </head>
     <body>
-        <p>
-            <a href="{% url 'envelope-list' %}">Envelopes</a>
-            <a href="{% url 'account-list' %}">Accounts</a>
-            <a href="{% url 'process' %}">Process</a>
-            <a href="/admin">Admin</a>
-        </p>
-        {% block 'content' %}
-        {% endblock %}
+        <div class="container">
+            <p>
+                <b class="me-3">Uncle Budget</b>
+                <a href="{% url 'envelope-list' %}">Envelopes</a> |
+                <a href="{% url 'account-list' %}">Accounts</a>
+                <a class="ms-3" href="{% url 'process' %}">Process</a> |
+                <a href="{% url 'upload' %}">Upload</a>
+                <a class="ms-3" href="/admin">Admin</a>
+            </p>
+            {% block 'content' %}
+            {% endblock %}
+        </div>
     </body>
 </html>

@@ -152,3 +152,11 @@ class ModelsTestCase(TestCase):
         self.assertTrue(item.receipt.balanced)
         item.delete()
         self.assertFalse(item.receipt.balanced)
+
+    def test_deleting_last_entry_deletes_receipt_and_items(self):
+        entry = Entry.objects.first()
+        num_receipts = len(Receipt.objects.all())
+        num_items = len(Item.objects.all())
+        entry.delete()
+        self.assertEquals(len(Receipt.objects.all()), num_receipts - 1)
+        self.assertEquals(len(Item.objects.all()), num_items - 1)

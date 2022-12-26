@@ -10,4 +10,5 @@ urlpatterns = [
     path('envelopes/<int:pk>', EnvelopeDetail.as_view(), name='envelope-detail'),
     path('process', process, name='process'),
     path('receipt/<int:pk>', receipt, name='receipt'),
+    path('upload', upload, name='upload'),
 ]

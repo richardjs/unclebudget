@@ -51,6 +51,13 @@ class Entry(models.Model):
         else:
             return f'(${-self.amount})'
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        if len(self.receipt.entry_set.all()) == 0:
+            self.receipt.delete()
+            return
+        self.receipt.save()
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.receipt.save()
@@ -88,7 +95,7 @@ class Item(models.Model):
     envelope = models.ForeignKey('Envelope', on_delete=models.CASCADE)
     receipt = models.ForeignKey(
         'Receipt',
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

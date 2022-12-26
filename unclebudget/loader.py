@@ -13,6 +13,9 @@ class LoadException(Exception):
 def load(account, text):
     charges = None
 
+    if type(text) == bytes:
+        text = text.decode()
+
     for loader in settings.UNCLEBUDGET_LOADERS:
         try:
             charges = import_module(loader).load(StringIO(text))

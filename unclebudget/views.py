@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import *
 
 from unclebudget.models import *
+from unclebudget.loader import load
 
 
 class AccountDetail(DetailView):
@@ -73,4 +74,26 @@ def receipt(request, pk):
         'receipt': receipt,
         'accounts': accounts,
         'envelopes': envelopes,
+    })
+
+
+def upload(request):
+    if request.method == 'POST':
+        account = get_object_or_404(Account, user=request.user, pk=request.POST['account'])
+        text = request.FILES['csv'].read()
+        entries = load(account, text)
+
+        loads = Load.objects.filter(user=request.user)
+        return render(request, 'unclebudget/upload.html', {
+            'entries': entries,
+            'loads': loads,
+        })
+
+
+    accounts = Account.objects.filter(user=request.user)
+    loads = Load.objects.filter(user=request.user)
+
+    return render(request, 'unclebudget/upload.html', {
+        'accounts': accounts,
+        'loads': loads,
     })

@@ -15,12 +15,14 @@
     <th>Date</th>
     <th>Amount</th>
     <th>Description</th>
+    <th>Receipt</th>
 </thead>
 {% for entry in account.entry_set.all %}
     <tr>
         <td>{{ entry.date|date:"m/d/y" }}</td>
         <td>${{ entry.amount }}</td>
         <td>{{ entry.description }}</td>
+        <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
     </tr>
 {% endfor %}
 </table>

@@ -1,0 +1,61 @@
+{% extends 'unclebudget/base.html' %}
+
+<h1>Upload</h1>
+
+{% block 'content' %}
+
+{% if entries %}
+
+<p>Entries created:</p>
+
+<table>
+
+{% for entry in entries %}
+<tr>
+    <td>{{ entry }}</td>
+    <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% else %}
+
+<form method="post" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<p>
+    <select name="account">
+        {% for account in accounts %}
+            <option value="{{ account.id }}">{{ account.name }}</option>
+        {% endfor %}
+    </select>
+</p>
+
+<p><input name="csv" type="file" /></p>
+
+<p><input type="submit" value="Upload" /></p>
+
+</form>
+
+{% endif %}
+
+<p>Loads:</p>
+
+<table>
+<th>Account</th>
+<th>Entries</th>
+<th>Timestamp</th>
+<th>Loader</th>
+{% for load in loads %}
+<tr>
+    <td>{{ load.entry_set.first.account.name }}</td>
+    <td>{{ load.entry_set.all|length }}</td>
+    <td>{{ load.timestamp }}</td>
+    <td>{{ load.loader }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
