@@ -38,9 +38,9 @@
     <th>Description</th>
 
     {% for item in receipt.item_set.all %}
-        {% include './partials/process_item.html' %}
+        {% include './partials/receipt_item.html' %}
     {% endfor %}
-    {% include './partials/process_item.html' %}
+    {% include './partials/receipt_item.html' %}
 </table>
 
 <p>

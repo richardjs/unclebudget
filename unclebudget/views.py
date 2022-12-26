@@ -69,7 +69,7 @@ def receipt(request, pk):
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
 
-    return render(request, 'unclebudget/process.html', {
+    return render(request, 'unclebudget/receipt.html', {
         'receipt': receipt,
         'accounts': accounts,
         'envelopes': envelopes,
