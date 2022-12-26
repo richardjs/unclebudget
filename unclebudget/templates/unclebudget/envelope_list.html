@@ -6,15 +6,15 @@
 
 <h1>Envelopes</h1>
 
-<ul>
+<table>
+<thead>
+    <th>Envelope</th>
+    <th>Balance</th>
+</thead>
 {% for envelope in object_list %}
-    <li>
-        <a href="{% url 'envelope-detail' envelope.id %}">
-            {{ envelope.name }}
-        </a>
-        ${{ envelope.balance }}
-    </li>
+    <td><a href="{% url 'envelope-detail' envelope.id %}">{{ envelope.name }}</a></td>
+    <td>${{ envelope.balance }}</td>
 {% endfor %}
-</li>
+</table>
 
 {% endblock %}

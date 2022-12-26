@@ -32,7 +32,6 @@ def load(account, text):
             continue
 
         receipt = Receipt()
-        receipt.amount = charge.amount
         receipt.user = account.user
         receipt.save()
 

@@ -1,5 +1,6 @@
 from csv import DictReader
 from datetime import datetime
+from decimal import Decimal
 
 from unclebudget.models import Entry
 
@@ -13,7 +14,7 @@ def load(file):
             continue
 
         entries.append(Entry(
-            amount = -float(row['Amount']),
+            amount = -Decimal(row['Amount']),
             date = datetime.strptime(row['Date'], '%m/%d/%Y').date(),
             description = row['Description'],
         ))

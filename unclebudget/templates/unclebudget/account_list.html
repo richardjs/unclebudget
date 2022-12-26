@@ -6,12 +6,17 @@
 
 <h1>Accounts</h1>
 
-<ul>
+<table>
+<thead>
+    <th>Account</th>
+    <th>Balance</th>
+</thead>
 {% for account in object_list %}
-    <li>
-        <a href="{% url 'account-detail' account.id %}">{{ account.name }}</a>
-        ${{ account.balance }}</li>
+    <tr>
+        <td><a href="{% url 'account-detail' account.id %}">{{ account.name }}</a></td>
+        <td>${{ account.balance }}</td>
+    </tr>
 {% endfor %}
-</ul>
+</table>
 
 {% endblock %}

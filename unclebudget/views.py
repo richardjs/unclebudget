@@ -31,7 +31,7 @@ def process(request):
     ).order_by('date').first()
 
     if not receipt:
-        return HttpResponse('All receipts balanced')
+        return redirect('envelope-list')
 
     return redirect('receipt', receipt.pk)
 

@@ -117,9 +117,9 @@ class ModelsTestCase(TestCase):
 
     def test_process_receipt(self):
         response = self.client.get(reverse('process'))
-
         # Everything is balanced in initial conditions
-        self.assertIsNone(response.context)
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, reverse('envelope-list'))
 
         # Unbalance the receipt
         item = Item.objects.first()
@@ -138,8 +138,9 @@ class ModelsTestCase(TestCase):
         })
 
         # Receipt should be balanced now
-        response = self.client.get(reverse('process'), follow=True)
-        self.assertIsNone(response.context)
+        response = self.client.get(reverse('process'))
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, reverse('envelope-list'))
 
     def test_changing_item_changes_receipt_balance(self):
         item = Item.objects.first()

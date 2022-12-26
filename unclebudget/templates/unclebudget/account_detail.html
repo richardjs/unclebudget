@@ -11,10 +11,15 @@
 <h3>Entries</h3>
 
 <table>
+<thead>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Description</th>
+</thead>
 {% for entry in account.entry_set.all %}
     <tr>
         <td>{{ entry.date|date:"m/d/y" }}</td>
-        <td>{{ entry.amount }}</td>
+        <td>${{ entry.amount }}</td>
         <td>{{ entry.description }}</td>
     </tr>
 {% endfor %}

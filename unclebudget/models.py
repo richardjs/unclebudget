@@ -88,8 +88,7 @@ class Item(models.Model):
     envelope = models.ForeignKey('Envelope', on_delete=models.CASCADE)
     receipt = models.ForeignKey(
         'Receipt',
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -127,10 +126,13 @@ class Load(models.Model):
 
 
 class Receipt(models.Model):
-    amount = models.DecimalField(max_digits=9, decimal_places=2)
     balance = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    @property
+    def amount(self):
+        return sum([entry.amount for entry in self.entry_set.all()])
 
     @property
     def balanced(self):
