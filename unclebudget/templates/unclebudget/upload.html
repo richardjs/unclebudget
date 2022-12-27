@@ -4,6 +4,10 @@
 
 {% block 'content' %}
 
+{% if no_new_entries %}
+<p>No new entries in upload.</p>
+{% endif %}
+
 {% if entries %}
 
 <p>Entries created:</p>
@@ -26,12 +30,15 @@
 {% csrf_token %}
 
 <p>
-    <select name="account" required>
-        <option></option>
-        {% for account in accounts %}
-            <option value="{{ account.id }}">{{ account.name }}</option>
-        {% endfor %}
-    </select>
+    <label>
+        Account:
+        <select name="account" required>
+            <option></option>
+            {% for account in accounts %}
+                <option value="{{ account.id }}">{{ account.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
 </p>
 
 <p><input name="csv" type="file" required /></p>

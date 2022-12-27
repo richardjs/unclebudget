@@ -86,10 +86,16 @@ def receipt(request, pk):
 
 
 def upload(request):
+    entries = None
+    no_new_entries = False
+
     if request.method == 'POST':
         account = get_object_or_404(Account, user=request.user, pk=request.POST['account'])
         text = request.FILES['csv'].read()
-        _, entries = load_entries(account, text)
+        load, entries = load_entries(account, text)
+        if not entries:
+            no_new_entries = True
+            load.delete()
 
     accounts = Account.objects.filter(user=request.user)
     loads = Load.objects.filter(user=request.user)
@@ -97,6 +103,8 @@ def upload(request):
     return render(request, 'unclebudget/upload.html', {
         'accounts': accounts,
         'loads': loads,
+        'entries': entries,
+        'no_new_entries': no_new_entries,
     })
 
 
