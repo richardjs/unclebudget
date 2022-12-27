@@ -1,0 +1,12 @@
+<h1>Envelopes</h1>
+
+<table>
+<thead>
+    <th>Envelope</th>
+    <th>Balance</th>
+</thead>
+{% for envelope in envelopes %}
+    <td><a href="{% url 'envelope-detail' envelope.id %}">{{ envelope.name }}</a></td>
+    <td>${{ envelope.balance }}</td>
+{% endfor %}
+</table>
