@@ -26,14 +26,15 @@
 {% csrf_token %}
 
 <p>
-    <select name="account">
+    <select name="account" required>
+        <option></option>
         {% for account in accounts %}
             <option value="{{ account.id }}">{{ account.name }}</option>
         {% endfor %}
     </select>
 </p>
 
-<p><input name="csv" type="file" /></p>
+<p><input name="csv" type="file" required /></p>
 
 <p><input type="submit" value="Upload" /></p>
 
