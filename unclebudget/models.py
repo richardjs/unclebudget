@@ -25,15 +25,8 @@ class Entry(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField()
     description = models.TextField()
-    load = models.ForeignKey(
-        'Load',
-        null=True, blank=True,
-        on_delete=models.PROTECT,
-    )
-    receipt = models.ForeignKey(
-        'Receipt',
-        on_delete=models.PROTECT,
-    )
+    load = models.ForeignKey('Load', null=True, blank=True, on_delete=models.PROTECT)
+    receipt = models.ForeignKey('Receipt', on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     @property
@@ -84,20 +77,11 @@ class Envelope(models.Model):
 
 class Item(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
+    date = models.DateField(blank=True, null=True)
     description = models.TextField()
     envelope = models.ForeignKey('Envelope', on_delete=models.PROTECT)
-    receipt = models.ForeignKey(
-        'Receipt',
-        on_delete=models.PROTECT,
-    )
+    receipt = models.ForeignKey('Receipt', on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    @property
-    def date(self):
-        if self.receipt.entry_set.exists():
-            return self.receipt.entry_set.first().date
-        else:
-            return None
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
@@ -106,6 +90,10 @@ class Item(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.receipt.save()
+
+        if self.receipt.entry_set.exists():
+            self.date = self.receipt.entry_set.first().date
+            self.save()
 
     def __str__(self):
         return f'{self.date} {self.amount} {self.description}'
