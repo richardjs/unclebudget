@@ -7,7 +7,7 @@ urlpatterns = [
     path('', summary, name='summary'),
 
     path('accounts/<int:pk>', account_detail, name='account-detail'),
-    path('envelopes/<int:pk>', EnvelopeDetail.as_view(), name='envelope-detail'),
+    path('envelopes/<int:pk>', envelope_detail, name='envelope-detail'),
     path('receipt/<int:pk>', receipt, name='receipt'),
 
     path('process', process, name='process'),

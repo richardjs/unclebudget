@@ -22,12 +22,17 @@ def account_detail(request, pk):
     })
 
 
-class EnvelopeDetail(DetailView):
-    template_name = 'unclebudget/envelope_detail.html'
-    def get_queryset(self):
-        return Envelope.objects.filter(
-            user=self.request.user, pk=self.kwargs['pk'],
-        )
+def envelope_detail(request, pk):
+    envelopes = Envelope.objects.filter(user=request.user)
+    try:
+        envelope = envelopes.get(pk=pk)
+    except Account.DoesNotExist:
+        raise Http404()
+
+    return render(request, 'unclebudget/envelope_detail.html', {
+        'envelope': envelope,
+        'envelopes': envelopes,
+    })
 
 
 def summary(request):
