@@ -113,7 +113,10 @@ class Item(models.Model):
 
     @property
     def date(self):
-        return self.receipt.entry_set.first().date
+        if self.receipt.entry_set.exists():
+            return self.receipt.entry_set.first().date
+        else:
+            return None
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
