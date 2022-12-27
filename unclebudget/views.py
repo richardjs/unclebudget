@@ -10,19 +10,28 @@ from .loader import load_entries
 
 
 class AccountDetail(DetailView):
-    model = Account
-
-
-class AccountList(ListView):
-    model = Account
+    template_name = 'unclebudget/account_detail.html'
+    def get_queryset(self):
+        return Account.objects.filter(
+            user=self.request.user, pk=self.kwargs['pk'],
+        )
 
 
 class EnvelopeDetail(DetailView):
-    model = Envelope
+    template_name = 'unclebudget/envelope_detail.html'
+    def get_queryset(self):
+        return Envelope.objects.filter(
+            user=self.request.user, pk=self.kwargs['pk'],
+        )
 
 
-class EnvelopeList(ListView):
-    model = Envelope
+def summary(request):
+    accounts = Account.objects.filter(user=request.user)
+    envelopes = Envelope.objects.filter(user=request.user)
+    return render(request, 'unclebudget/summary.html', {
+        'accounts': accounts,
+        'envelopes': envelopes,
+    })
 
 
 def process(request):
@@ -32,7 +41,7 @@ def process(request):
     ).order_by('date').first()
 
     if not receipt:
-        return redirect('envelope-list')
+        return redirect('summary')
 
     return redirect('receipt', receipt.pk)
 

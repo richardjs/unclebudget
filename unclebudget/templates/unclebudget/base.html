@@ -1,7 +1,7 @@
 {% load static %}
 
 <!doctype html>
-<html>
+<html data-bs-theme="dark">
     <head>
         <meta charset="utf-8">
         <title>{% block 'title' %}{% endblock %}</title>
@@ -10,9 +10,7 @@
     <body>
         <div class="container">
             <p>
-                <b class="me-3">Uncle Budget</b>
-                <a href="{% url 'envelope-list' %}">Envelopes</a> |
-                <a href="{% url 'account-list' %}">Accounts</a>
+                <b class="me-3"><a href="{% url 'summary' %}">Uncle Budget</a></b>
                 <a class="ms-3" href="{% url 'process' %}">Process</a> |
                 <a href="{% url 'upload' %}">Upload</a>
                 <a class="ms-3" href="/admin">Admin</a>

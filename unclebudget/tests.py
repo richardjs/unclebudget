@@ -119,7 +119,7 @@ class ModelsTestCase(TestCase):
         response = self.client.get(reverse('process'))
         # Everything is balanced in initial conditions
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse('envelope-list'))
+        self.assertEquals(response.url, reverse('summary'))
 
         # Unbalance the receipt
         item = Item.objects.first()
@@ -140,7 +140,7 @@ class ModelsTestCase(TestCase):
         # Receipt should be balanced now
         response = self.client.get(reverse('process'))
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse('envelope-list'))
+        self.assertEquals(response.url, reverse('summary'))
 
     def test_changing_item_changes_receipt_balance(self):
         item = Item.objects.first()
@@ -195,3 +195,12 @@ class ModelsTestCase(TestCase):
 
         self.assertEquals(len(Entry.objects.all()), num_entries - 4)
         self.assertEquals(len(Receipt.objects.all()), num_receipts - 4)
+
+    def test_access_limited_to_user(self):
+        User.objects.create_user(
+           'testuser2', 'testuser2@example.com', 'password').save()
+        self.client.login(username='testuser2', password='password')
+        response = self.client.get(reverse('account-detail', kwargs={'pk': 1}))
+        self.assertEquals(response.status_code, 404)
+        response = self.client.get(reverse('envelope-detail', kwargs={'pk': 1}))
+        self.assertEquals(response.status_code, 404)
