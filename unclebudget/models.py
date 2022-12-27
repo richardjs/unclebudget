@@ -1,13 +1,12 @@
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.db import models
 
 
 class Account(models.Model):
-    name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    initial_balance = models.DecimalField(max_digits=9, decimal_places=2)
+    name = models.TextField()
+    initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     start_date = models.DateField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     @property
     def balance(self):
@@ -25,7 +24,7 @@ class Entry(models.Model):
     account = models.ForeignKey('Account', on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField()
-    description = models.CharField(max_length=255)
+    description = models.TextField()
     load = models.ForeignKey(
         'Load',
         null=True, blank=True,
@@ -34,13 +33,6 @@ class Entry(models.Model):
     receipt = models.ForeignKey(
         'Receipt',
         on_delete=models.PROTECT,
-    )
-    transfer_to = models.OneToOneField(
-        'self',
-        related_name='transfer_from',
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
-        limit_choices_to={'receipt': None, 'transfer_to': None},
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -67,12 +59,8 @@ class Entry(models.Model):
 
 
 class Envelope(models.Model):
-    name = models.CharField(max_length=255)
-    parent = models.ForeignKey(
-        'self',
-        null=True, blank=True,
-        on_delete=models.PROTECT
-    )
+    name = models.TextField()
+    initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     @property
@@ -96,20 +84,13 @@ class Envelope(models.Model):
 
 class Item(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
-    description = models.CharField(max_length=255)
+    description = models.TextField()
     envelope = models.ForeignKey('Envelope', on_delete=models.PROTECT)
     receipt = models.ForeignKey(
         'Receipt',
         on_delete=models.PROTECT,
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    @property
-    def amount_str(self):
-        if self.amount > 0:
-            return f'${self.amount}'
-        else:
-            return f'(${-self.amount})'
 
     @property
     def date(self):
@@ -127,11 +108,11 @@ class Item(models.Model):
         self.receipt.save()
 
     def __str__(self):
-        return f'{self.date} {self.amount_str} {self.description}'
+        return f'{self.date} {self.amount} {self.description}'
 
 
 class Load(models.Model):
-    loader = models.CharField(max_length=255)
+    loader = models.TextField()
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -166,9 +147,9 @@ class Receipt(models.Model):
         super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        # We need to save a new object before we can run the calculations below
         if self.pk == None:
-            # We need to save it before we can run the calculations below
-            # balanced is required, so set it temporarily
+            # balance is required, so set it temporarily
             self.balance = 0
             super().save(*args, **kwargs)
 
@@ -176,9 +157,9 @@ class Receipt(models.Model):
             sum([entry.amount for entry in self.entry_set.all()]) -
             sum([item.amount for item in self.item_set.all()])
         )
-        first_entry = self.entry_set.first()
-        if first_entry:
-            self.date = first_entry.date
+
+        if self.entry_set.exists():
+            self.date = self.entry_set.first().date
 
         super().save(*args, **kwargs)
 
