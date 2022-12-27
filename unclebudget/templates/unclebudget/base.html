@@ -1,7 +1,7 @@
 {% load static %}
 
 <!doctype html>
-<html data-bs-theme="dark">
+<html {% if theme == 'dark' %}data-bs-theme="dark"{% endif %}>
     <head>
         <meta charset="utf-8">
         <title>{% block 'title' %}{% endblock %}</title>
@@ -14,6 +14,7 @@
                 <a class="ms-3" href="{% url 'process' %}">Process</a> |
                 <a href="{% url 'upload' %}">Upload</a>
                 <a class="ms-3" href="/admin">Admin</a>
+                <a class="ms-3" href="{% url 'toggle_theme' %}">{% if theme == 'dark' %}light mode{% else %}dark mode{% endif %}</a>
             </p>
             {% block 'content' %}
             {% endblock %}

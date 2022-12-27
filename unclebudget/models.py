@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.db import models
 
 
@@ -181,3 +181,23 @@ class Receipt(models.Model):
 
     def __str__(self):
         return f'#{self.id}'
+
+
+class SettingsManager(models.Manager):
+    def for_user(self, user):
+        if user == AnonymousUser:
+            raise Settings.DoesNotExist
+        try:
+            settings = self.get(user=user)
+        except Settings.DoesNotExist:
+            settings = Settings()
+            settings.user = user
+            settings.save()
+        return settings
+
+
+class Settings(models.Model):
+    dark_mode = models.BooleanField(default=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    objects = SettingsManager()

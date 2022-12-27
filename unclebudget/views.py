@@ -1,8 +1,7 @@
 from decimal import Decimal
 
 from django.db.models import Q
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import *
 
 from .models import *
@@ -99,3 +98,10 @@ def upload(request):
         'accounts': accounts,
         'loads': loads,
     })
+
+
+def toggle_theme(request):
+    settings = Settings.objects.for_user(request.user)
+    settings.dark_mode = not settings.dark_mode
+    settings.save()
+    return redirect(request.META.get('HTTP_REFERER', reverse('summary')))

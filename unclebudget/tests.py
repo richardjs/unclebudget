@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 from django.urls import reverse
 
@@ -204,3 +204,14 @@ class ModelsTestCase(TestCase):
         self.assertEquals(response.status_code, 404)
         response = self.client.get(reverse('envelope-detail', kwargs={'pk': 1}))
         self.assertEquals(response.status_code, 404)
+
+    def test_dark_mode_toggle(self):
+        response = self.client.get('/')
+        self.assertIn('data-bs-theme="dark"', response.content.decode())
+        self.client.get(reverse('toggle_theme'))
+        response = self.client.get('/')
+        self.assertNotIn('data-bs-theme="dark"', response.content.decode())
+
+    def test_no_anonymous_settings(self):
+        with self.assertRaises(Settings.DoesNotExist):
+            Settings.objects.for_user(AnonymousUser)
