@@ -100,7 +100,8 @@ class ModelsTestCase(TestCase):
             item.save()
 
     def test_account_balance(self):
-        self.assertEquals(self.account.balance, Decimal('902.92'))
+        account = Account.objects.first()
+        self.assertEquals(account.balance, Decimal('902.92'))
 
     def test_receipts_created(self):
         self.assertEquals(len(Receipt.objects.all()), 4)
@@ -215,3 +216,9 @@ class ModelsTestCase(TestCase):
     def test_no_anonymous_settings(self):
         with self.assertRaises(Settings.DoesNotExist):
             Settings.objects.for_user(AnonymousUser)
+
+    def test_account_initial_balance(self):
+        account = Account.objects.first()
+        self.assertEquals(account.balance, Decimal('902.92'))
+        account.initial_balance = 1000
+        self.assertEquals(account.balance, Decimal('1902.92'))

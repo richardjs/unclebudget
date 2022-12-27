@@ -11,11 +11,11 @@ class Account(models.Model):
 
     @property
     def balance(self):
-        balance = 0
+        balance = self.initial_balance
         for entry in self.entry_set.all():
-            balance += entry.amount
+            balance -= entry.amount
 
-        return -balance
+        return balance
 
     def __str__(self):
         return f'{self.name}'
