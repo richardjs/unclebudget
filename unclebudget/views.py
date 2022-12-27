@@ -26,7 +26,7 @@ def envelope_detail(request, pk):
     envelopes = Envelope.objects.filter(user=request.user)
     try:
         envelope = envelopes.get(pk=pk)
-    except Account.DoesNotExist:
+    except Envelope.DoesNotExist:
         raise Http404()
 
     return render(request, 'unclebudget/envelope_detail.html', {
