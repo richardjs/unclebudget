@@ -6,27 +6,34 @@
 
 {% block 'content' %}
 
-<h1>{{ account.name }}</h1>
+<div class="row">
+    <div class="col-8">
+        <h1>{{ account.name }}</h1>
 
-<h2>${{ account.balance|intcomma }}</h2>
+        <h2>${{ account.balance|intcomma }}</h2>
 
-<h3>Entries</h3>
+        <h3>Entries</h3>
 
-<table>
-<thead>
-    <th>Date</th>
-    <th>Amount</th>
-    <th>Description</th>
-    <th>Receipt</th>
-</thead>
-{% for entry in account.entry_set.all|dictsortreversed:'date' %}
-    <tr>
-        <td>{{ entry.date|date:"m/d/y" }}</td>
-        <td>${{ entry.amount|intcomma }}</td>
-        <td>{{ entry.description }}</td>
-        <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
-    </tr>
-{% endfor %}
-</table>
+        <table>
+        <thead>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Receipt</th>
+        </thead>
+        {% for entry in account.entry_set.all|dictsortreversed:'date' %}
+            <tr>
+                <td>{{ entry.date|date:"m/d/y" }}</td>
+                <td>${{ entry.amount|intcomma }}</td>
+                <td>{{ entry.description }}</td>
+                <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+    <div class="col-4">
+        {% include 'unclebudget/partials/account_list.html' %}
+    </div>
+</div>
 
 {% endblock %}

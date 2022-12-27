@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import *
 
@@ -8,12 +9,17 @@ from .models import *
 from .loader import load_entries
 
 
-class AccountDetail(DetailView):
-    template_name = 'unclebudget/account_detail.html'
-    def get_queryset(self):
-        return Account.objects.filter(
-            user=self.request.user, pk=self.kwargs['pk'],
-        )
+def account_detail(request, pk):
+    accounts = Account.objects.filter(user=request.user)
+    try:
+        account = accounts.get(pk=pk)
+    except Account.DoesNotExist:
+        raise Http404()
+
+    return render(request, 'unclebudget/account_detail.html', {
+        'account': account,
+        'accounts': accounts,
+    })
 
 
 class EnvelopeDetail(DetailView):
