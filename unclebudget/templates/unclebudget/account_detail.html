@@ -19,7 +19,7 @@
     <th>Description</th>
     <th>Receipt</th>
 </thead>
-{% for entry in account.entry_set.all %}
+{% for entry in account.entry_set.all|dictsortreversed:'date' %}
     <tr>
         <td>{{ entry.date|date:"m/d/y" }}</td>
         <td>${{ entry.amount|intcomma }}</td>
