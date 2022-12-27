@@ -1,12 +1,14 @@
 {% extends 'unclebudget/base.html' %}
 
+{% load humanize %}
+
 {% block 'title' %}{{ account.name }}{% endblock %}
 
 {% block 'content' %}
 
 <h1>{{ account.name }}</h1>
 
-<h2>${{ account.balance }}</h2>
+<h2>${{ account.balance|intcomma }}</h2>
 
 <h3>Entries</h3>
 
@@ -20,7 +22,7 @@
 {% for entry in account.entry_set.all %}
     <tr>
         <td>{{ entry.date|date:"m/d/y" }}</td>
-        <td>${{ entry.amount }}</td>
+        <td>${{ entry.amount|intcomma }}</td>
         <td>{{ entry.description }}</td>
         <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
     </tr>
