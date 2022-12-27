@@ -16,9 +16,12 @@ def account_detail(request, pk):
     except Account.DoesNotExist:
         raise Http404()
 
+    entries = account.entry_set.all().order_by('-date')
+
     return render(request, 'unclebudget/account_detail.html', {
         'account': account,
         'accounts': accounts,
+        'entries': entries,
     })
 
 
