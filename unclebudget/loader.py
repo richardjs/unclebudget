@@ -3,14 +3,14 @@ from io import StringIO
 
 from django.conf import settings
 
-from .models import Load, Receipt
+from .models import *
 
 
 class LoadException(Exception):
     pass
 
 
-def load(account, text):
+def load_entries(account, text):
     charges = None
 
     if type(text) == bytes:
@@ -34,6 +34,14 @@ def load(account, text):
         if charge.date < account.start_date:
             continue
 
+        # Look for duplicates
+        if Entry.objects.filter(
+            account=account,
+            date=charge.date,
+            description=charge.description,
+        ).exists():
+            continue
+
         receipt = Receipt()
         receipt.user = account.user
         receipt.save()
@@ -46,4 +54,4 @@ def load(account, text):
 
         entries.append(charge)
 
-    return entries
+    return load, entries

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from .loader import load
+from .loader import load_entries
 from .models import *
 
 
@@ -22,34 +22,34 @@ class LoaderTestCase(TestCase):
         )
         self.account.save()
 
-    def test_first_loader(self):
+    def test_first_load_entrieser(self):
         csv = '''"Date","Description","Amount"
 01/12/2021,"Pending: BOBS GAS",-20
 01/11/2021,"Daily Ledger Bal",,10000.00,,
 01/11/2021,"PAYFRIEND",-30
 01/11/2021,"WALLSHOP",-62.57
 01/10/2021,"MICKEY KING",-4.51'''
-        entries = load(self.account, csv)
+        _, entries = load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 3)
 
-    def test_second_loader(self):
+    def test_second_load_entrieser(self):
         csv = '''Transaction Date,Post Date,Transaction Detail,Amount
 2021-01-20,2021-01-20,SUPER SUSHI,10.10
 2021-01-19,2021-01-20,WAYOUT,300.20
 2021-01-19,2021-01-20,ZAXDEE,8.30
 2021-01-22,2021-01-22,GROVERS GROCERY,35.50
 2021-02-04,2021-02-04,PAYMENT,-354.10'''
-        entries = load(self.account, csv)
+        _, entries = load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 5)
 
-    def test_loader_and_dawn_of_time(self):
+    def test_load_entrieser_and_dawn_of_time(self):
         csv = '''Transaction Date,Post Date,Transaction Detail,Amount
 1969-12-31,2021-01-20,SUPER SUSHI,10.10
 2021-01-19,2021-01-20,WAYOUT,300.20
 2021-01-19,2021-01-20,ZAXDEE,8.30
 2021-01-22,2021-01-22,GROVERS GROCERY,35.50
 2021-02-04,2021-02-04,PAYMENT,-354.10'''
-        entries = load(self.account, csv)
+        _, entries = load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 4)
 
     def test_receipt_amounts_equals_charge_amounts(self):
@@ -59,7 +59,7 @@ class LoaderTestCase(TestCase):
 2021-01-19,2021-01-20,ZAXDEE,8.30
 2021-01-22,2021-01-22,GROVERS GROCERY,35.50
 2021-02-04,2021-02-04,PAYMENT,-354.10'''
-        entries = load(self.account, csv)
+        _, entries = load_entries(self.account, csv)
         for entry in entries:
             self.assertEquals(entry.amount, entry.receipt.amount)
 
@@ -82,7 +82,7 @@ class ModelsTestCase(TestCase):
 01/11/2021,"WALLSHOP",-62.57
 01/10/2021,"MICKEY KING",-4.51
 01/9/2021,"PAYCHECK",1000.00'''
-        entries = load(self.account, csv)
+        _, entries = load_entries(self.account, csv)
 
         self.envelope = Envelope(
             name='Test Envelope', user=self.user,
@@ -160,3 +160,38 @@ class ModelsTestCase(TestCase):
         entry.delete()
         self.assertEquals(len(Receipt.objects.all()), num_receipts - 1)
         self.assertEquals(len(Item.objects.all()), num_items - 1)
+
+    def test_load_entries_duplicates(self):
+        num_entries = len(Entry.objects.all())
+        csv = '''"Date","Description","Amount"
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"WALLSHOP",-62.57
+01/10/2021,"MICKEY KING",-4.51
+01/9/2021,"PAYCHECK",1000.00'''
+        load_entries(self.account, csv)
+        self.assertEquals(len(Entry.objects.all()), num_entries)
+
+        csv = '''"Date","Description","Amount"
+01/12/2021,"NEW ENTRY",-30
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"WALLSHOP",-62.57
+01/10/2021,"MICKEY KING",-4.51
+01/9/2021,"PAYCHECK",1000.00'''
+        load_entries(self.account, csv)
+        self.assertEquals(len(Entry.objects.all()), num_entries + 1)
+
+    def test_deleting_load_entries_deletes_entries_and_receipts(self):
+        csv = '''"Date","Description","Amount"
+01/11/2021,"NEW PAYFRIEND",-30
+01/11/2021,"NEW WALLSHOP",-62.57
+01/10/2021,"NEW MICKEY KING",-4.51
+01/9/2021,"NEW PAYCHECK",1000.00'''
+        load, _ = load_entries(self.account, csv)
+
+        num_entries = len(Entry.objects.all())
+        num_receipts = len(Receipt.objects.all())
+
+        load.delete()
+
+        self.assertEquals(len(Entry.objects.all()), num_entries - 4)
+        self.assertEquals(len(Receipt.objects.all()), num_receipts - 4)

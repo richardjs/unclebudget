@@ -22,14 +22,14 @@ class Account(models.Model):
 
 
 class Entry(models.Model):
-    account = models.ForeignKey('Account', on_delete=models.CASCADE)
+    account = models.ForeignKey('Account', on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField()
     description = models.CharField(max_length=255)
     load = models.ForeignKey(
         'Load',
         null=True, blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     receipt = models.ForeignKey(
         'Receipt',
@@ -71,7 +71,7 @@ class Envelope(models.Model):
     parent = models.ForeignKey(
         'self',
         null=True, blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -83,6 +83,11 @@ class Envelope(models.Model):
 
         return -balance
 
+    def delete(self):
+        for item in self.item_set.all():
+            item.delete()
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         if self.parent:
             return f'{self.parent}: {self.name}'
@@ -92,10 +97,10 @@ class Envelope(models.Model):
 class Item(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     description = models.CharField(max_length=255)
-    envelope = models.ForeignKey('Envelope', on_delete=models.CASCADE)
+    envelope = models.ForeignKey('Envelope', on_delete=models.PROTECT)
     receipt = models.ForeignKey(
         'Receipt',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -128,6 +133,11 @@ class Load(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def delete(self, *args, **kwargs):
+        for entry in self.entry_set.all():
+            entry.delete()
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return f'{self.timestamp} {self.loader}'
 
@@ -144,6 +154,13 @@ class Receipt(models.Model):
     @property
     def balanced(self):
         return self.balance == 0
+
+    def delete(self, *args, **kwargs):
+        for entry in self.entry_set.all():
+            entry.delete()
+        for item in self.item_set.all():
+            item.delete()
+        super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         if self.pk == None:
