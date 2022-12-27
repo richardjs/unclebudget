@@ -13,5 +13,5 @@ urlpatterns = [
     path('process', process, name='process'),
     path('upload', upload, name='upload'),
 
-    path('toggle_theme', toggle_theme, name='toggle_theme'),
+    path('toggle-theme', toggle_theme, name='toggle-theme'),
 ]

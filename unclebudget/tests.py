@@ -209,7 +209,7 @@ class ModelsTestCase(TestCase):
     def test_dark_mode_toggle(self):
         response = self.client.get('/')
         self.assertIn('data-bs-theme="dark"', response.content.decode())
-        self.client.get(reverse('toggle_theme'))
+        self.client.get(reverse('toggle-theme'))
         response = self.client.get('/')
         self.assertNotIn('data-bs-theme="dark"', response.content.decode())
 
