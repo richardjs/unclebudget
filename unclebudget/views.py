@@ -82,7 +82,10 @@ def receipt(request, pk):
             else:
                 item = Item()
 
-            item.amount = Decimal(amount)
+            if amount:
+                item.amount = Decimal(amount)
+            else:
+                item.amount = receipt.balance
             item.description = description
             item.envelope = envelope
             item.receipt = receipt
