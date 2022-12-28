@@ -1,8 +1,18 @@
 {% extends 'unclebudget/base.html' %}
 
+{% load humanize %}
+
 {% block 'title' %}Envelopes{% endblock %}
 
 {% block 'content' %}
+
+{% if to_process|length %}
+<div class="row">
+    <div class="col">
+        {{ to_process|length }} receipts to process
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="col">

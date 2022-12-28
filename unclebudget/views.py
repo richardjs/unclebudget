@@ -53,11 +53,18 @@ def summary(request):
     accounts_balance = sum([account.balance for account in accounts])
     envelopes_balance = sum([envelope.balance for envelope in envelopes])
 
+    # TODO we probably want this on the receipt screen, or at the top
+    to_process = Receipt.objects.filter(
+        ~Q(balance=0),
+        user=request.user,
+    ).order_by('date')
+
     return render(request, 'unclebudget/summary.html', {
         'accounts': accounts,
         'accounts_balance': accounts_balance,
         'envelopes': envelopes,
         'envelopes_balance': envelopes_balance,
+        'to_process': to_process,
     })
 
 
