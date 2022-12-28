@@ -113,6 +113,9 @@ def receipt(request, pk):
             item.user = request.user
             item.save()
 
+        if receipt.balance == 0:
+            return redirect(reverse('process'))
+
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
 
