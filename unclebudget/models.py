@@ -70,8 +70,6 @@ class Envelope(models.Model):
         super().delete(*args, **kwargs)
 
     def __str__(self):
-        if self.parent:
-            return f'{self.parent}: {self.name}'
         return f'{self.name}'
 
 
