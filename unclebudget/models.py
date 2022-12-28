@@ -2,11 +2,21 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.db import models
 
 
+class AccountManager(models.Manager):
+    def user_balance(self, user):
+        return sum([
+            account.balance
+            for account in Account.objects.filter(user=user)
+        ])
+
+
 class Account(models.Model):
     name = models.TextField()
     initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     start_date = models.DateField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    objects = AccountManager()
 
     @property
     def balance(self):
@@ -51,10 +61,20 @@ class Entry(models.Model):
         return f'{self.date} {self.amount_str} {self.description}'
 
 
+class EnvelopeManager(models.Manager):
+    def user_balance(self, user):
+        return sum([
+            envelope.balance
+            for envelope in Envelope.objects.filter(user=user)
+        ])
+
+
 class Envelope(models.Model):
     name = models.TextField()
     initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    objects = EnvelopeManager()
 
     @property
     def balance(self):
