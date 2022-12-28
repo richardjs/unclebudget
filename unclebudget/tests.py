@@ -222,7 +222,3 @@ class ModelsTestCase(TestCase):
         self.assertEquals(account.balance, Decimal('902.92'))
         account.initial_balance = 1000
         self.assertEquals(account.balance, Decimal('1902.92'))
-
-    def test_user_balance(self):
-        self.assertEquals(Account.objects.user_balance(self.user), Decimal('902.92'))
-        self.assertEquals(Envelope.objects.user_balance(self.user), Decimal('902.92'))

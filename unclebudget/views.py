@@ -18,9 +18,12 @@ def account_detail(request, pk):
 
     entries = account.entry_set.all().order_by('-date')
 
+    accounts_balance = sum([entry.balance for balance in entries])
+
     return render(request, 'unclebudget/account_detail.html', {
         'account': account,
         'accounts': accounts,
+        'accounts_balance': accounts_balance,
         'entries': entries,
     })
 
@@ -32,18 +35,29 @@ def envelope_detail(request, pk):
     except Envelope.DoesNotExist:
         raise Http404()
 
+    envelopes_balance = sum([envelope.balance for envelope in envelopes])
+
     return render(request, 'unclebudget/envelope_detail.html', {
         'envelope': envelope,
         'envelopes': envelopes,
+        'envelopes_balance': envelopes_balance,
     })
 
 
 def summary(request):
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
+
+    # TODO we should probably cache this somewhere
+    # (but we also want to make sure it's actually useful data)
+    accounts_balance = sum([account.balance for account in accounts])
+    envelopes_balance = sum([envelope.balance for envelope in envelopes])
+
     return render(request, 'unclebudget/summary.html', {
         'accounts': accounts,
+        'accounts_balance': accounts_balance,
         'envelopes': envelopes,
+        'envelopes_balance': envelopes_balance,
     })
 
 

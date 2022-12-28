@@ -5,6 +5,12 @@
         <th>Envelope</th>
         <th>Balance</th>
     </thead>
+
+    <tr>
+        <td><b>Total</b></td>
+        <td><b>${{ envelopes_balance }}</b></td>
+    </tr>
+
     {% for envelope in envelopes %}
         <tr>
             <td><a href="{% url 'envelope-detail' envelope.id %}">{{ envelope.name }}</a></td>

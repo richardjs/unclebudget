@@ -1,14 +1,20 @@
 <h1>Accounts</h1>
 
 <table>
-<thead>
-    <th>Account</th>
-    <th>Balance</th>
-</thead>
-{% for account in accounts %}
+    <thead>
+        <th>Account</th>
+        <th>Balance</th>
+    </thead>
+
     <tr>
-        <td><a href="{% url 'account-detail' account.id %}">{{ account.name }}</a></td>
-        <td>${{ account.balance }}</td>
+        <td><b>Total</b></td>
+        <td><b>${{ accounts_balance }}</b></td>
     </tr>
+
+    {% for account in accounts %}
+        <tr>
+            <td><a href="{% url 'account-detail' account.id %}">{{ account.name }}</a></td>
+            <td>${{ account.balance }}</td>
+        </tr>
 {% endfor %}
 </table>
