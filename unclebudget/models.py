@@ -92,8 +92,10 @@ class Item(models.Model):
         self.receipt.save()
 
         if self.receipt.entry_set.exists():
-            self.date = self.receipt.entry_set.first().date
-            self.save()
+            receipt_date = self.receipt.entry_set.first().date
+            if self.date != receipt_date:
+                self.date = receipt_date
+                self.save()
 
     def __str__(self):
         return f'{self.date} {self.amount} {self.description}'
