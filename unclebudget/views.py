@@ -16,9 +16,9 @@ def account_detail(request, pk):
     except Account.DoesNotExist:
         raise Http404()
 
-    entries = account.entry_set.all().order_by('-date')
+    entries = account.entry_set.all()
 
-    accounts_balance = sum([entry.balance for balance in entries])
+    accounts_balance = sum([account.balance for account in accounts])
 
     return render(request, 'unclebudget/account_detail.html', {
         'account': account,

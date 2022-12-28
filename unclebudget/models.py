@@ -8,6 +8,9 @@ class Account(models.Model):
     start_date = models.DateField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['name']
+
     @property
     def balance(self):
         balance = self.initial_balance
@@ -28,6 +31,9 @@ class Entry(models.Model):
     load = models.ForeignKey('Load', null=True, blank=True, on_delete=models.PROTECT)
     receipt = models.ForeignKey('Receipt', on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-date']
 
     @property
     def amount_str(self):
@@ -56,6 +62,9 @@ class Envelope(models.Model):
     initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['name']
+
     @property
     def balance(self):
         balance = 0
@@ -81,6 +90,9 @@ class Item(models.Model):
     receipt = models.ForeignKey('Receipt', on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['-date']
+
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
         self.receipt.save()
@@ -105,6 +117,9 @@ class Load(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['-timestamp']
+
     def delete(self, *args, **kwargs):
         for entry in self.entry_set.all():
             entry.delete()
@@ -118,6 +133,9 @@ class Receipt(models.Model):
     balance = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-date']
 
     @property
     def amount(self):
