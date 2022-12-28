@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <h1>Accounts</h1>
 
 <table>
@@ -8,13 +10,13 @@
 
     <tr>
         <td><b>Total</b></td>
-        <td><b>${{ accounts_balance }}</b></td>
+        <td><b>${{ accounts_balance|intcomma }}</b></td>
     </tr>
 
     {% for account in accounts %}
         <tr>
             <td><a href="{% url 'account-detail' account.id %}">{{ account.name }}</a></td>
-            <td>${{ account.balance }}</td>
+            <td>${{ account.balance|intcomma }}</td>
         </tr>
 {% endfor %}
 </table>

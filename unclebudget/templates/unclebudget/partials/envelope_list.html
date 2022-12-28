@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <h1>Envelopes</h1>
 
 <table>
@@ -8,13 +10,13 @@
 
     <tr>
         <td><b>Total</b></td>
-        <td><b>${{ envelopes_balance }}</b></td>
+        <td><b>${{ envelopes_balance|intcomma }}</b></td>
     </tr>
 
     {% for envelope in envelopes %}
         <tr>
             <td><a href="{% url 'envelope-detail' envelope.id %}">{{ envelope.name }}</a></td>
-            <td>${{ envelope.balance }}</td>
+            <td>${{ envelope.balance|intcomma }}</td>
         </tr>
     {% endfor %}
 </table>

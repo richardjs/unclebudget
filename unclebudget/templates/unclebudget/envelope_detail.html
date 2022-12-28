@@ -1,5 +1,7 @@
 {% extends 'unclebudget/base.html' %}
 
+{% load humanize %}
+
 {% block 'title' %}{{ envelope.name }}{% endblock %}
 
 {% block 'content' %}
@@ -16,7 +18,7 @@
             </thead>
             {% for item in envelope.item_set.all %}
                 <tr>
-                    <td>${{ item.amount }}</td>
+                    <td>${{ item.amount|intcomma }}</td>
                     <td>{{ item.description }}</td>
                     <td>
                         <a href="{% url 'receipt' item.receipt.id %}">
