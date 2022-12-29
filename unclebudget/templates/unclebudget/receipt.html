@@ -6,49 +6,64 @@
 
 {% block 'content' %}
 
-<form method="post">
-{% csrf_token %}
 
-<h1>
-    {{ receipt.date }}
-    ${{ receipt.amount|intcomma }}
-</h1>
+<div class="row">
+    <div class="col-8">
+        <form method="post">
+        {% csrf_token %}
+        <h1>
+            {{ receipt.date }}
+            ${{ receipt.amount|intcomma }}
+        </h1>
 
-<h2>Balance: ${{ receipt.balance|intcomma }}</p>
+        <h2>Balance: ${{ receipt.balance|intcomma }}</p>
 
-<h2>Account entries</h2>
+        <h2>Account entries</h2>
 
-<table>
-    <th>Account</th>
-    <th>Amount</th>
-    <th>Description</th>
+        <table>
+            <th>Account</th>
+            <th>Amount</th>
+            <th>Description</th>
 
-    {% for entry in receipt.entry_set.all %}
-        <tr>
-            <td>{{ entry.account.name }}</td>
-            <td>${{ entry.amount|intcomma }}</td>
-            <td>{{ entry.description }}</td>
-        </tr>
-    {% endfor %}
-</table>
+            {% for entry in receipt.entry_set.all %}
+                <tr>
+                    <td>{{ entry.account.name }}</td>
+                    <td>${{ entry.amount|intcomma }}</td>
+                    <td>{{ entry.description }}</td>
+                </tr>
+            {% endfor %}
+        </table>
 
-<h2>Envelope items</h2>
+        <h2>Envelope items</h2>
 
-<table>
-    <th>Envelope</th>
-    <th>Amount</th>
-    <th>Description</th>
+        <table>
+            <th>Envelope</th>
+            <th>Amount</th>
+            <th>Description</th>
 
-    {% for item in receipt.item_set.all %}
-        {% include './partials/receipt_item.html' %}
-    {% endfor %}
-    {% include './partials/receipt_item.html' %}
-</table>
+            {% for item in receipt.item_set.all %}
+                {% include './partials/receipt_item.html' %}
+            {% endfor %}
+            {% include './partials/receipt_item.html' %}
+        </table>
 
-<p>
-    <input type="submit" value="Update">
-</p>
+        <p>
+            <input type="submit" value="Update">
+        </p>
+    </div>
+    <div class="col-4">
+        <h2>Open Receipts</h2>
+        <table>
+        {% for receipt in to_process %}
+            <tr>
+                <td>{{ receipt.date }}</td>
+                <td>${{ receipt.balance|intcomma }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        </form>
+    </div>
+</div>
 
-</form>
 
 {% endblock %}
