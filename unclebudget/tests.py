@@ -222,3 +222,11 @@ class ModelsTestCase(TestCase):
         self.assertEquals(account.balance, Decimal('902.92'))
         account.initial_balance = 1000
         self.assertEquals(account.balance, Decimal('1902.92'))
+
+    def test_receipt_description(self):
+        receipt = Receipt.objects.first()
+        self.assertEquals(receipt.description, 'PAYFRIEND')
+        entry = Entry.objects.last()
+        entry.receipt = receipt
+        entry.save()
+        self.assertEquals(receipt.description, '2 entries')

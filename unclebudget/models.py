@@ -146,6 +146,13 @@ class Receipt(models.Model):
     def balanced(self):
         return self.balance == 0
 
+    @property
+    def description(self):
+        entry_count = len(self.entry_set.all())
+        if entry_count == 1:
+            return self.entry_set.first().description
+        return f'{entry_count} entries'
+
     def delete(self, *args, **kwargs):
         for entry in self.entry_set.all():
             entry.delete()
