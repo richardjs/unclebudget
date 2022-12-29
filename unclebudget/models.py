@@ -89,6 +89,7 @@ class Item(models.Model):
     envelope = models.ForeignKey('Envelope', on_delete=models.PROTECT)
     receipt = models.ForeignKey('Receipt', on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    tags = models.ManyToManyField('Tag')
 
     class Meta:
         ordering = ['-date']
@@ -191,3 +192,8 @@ class Settings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     objects = SettingsManager()
+
+
+class Tag(models.Model):
+    name = models.TextField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
