@@ -67,11 +67,11 @@ class Envelope(models.Model):
 
     @property
     def balance(self):
-        balance = 0
+        balance = self.initial_balance
         for item in self.item_set.all():
-            balance += item.amount
+            balance -= item.amount
 
-        return -balance
+        return balance
 
     def delete(self):
         for item in self.item_set.all():
