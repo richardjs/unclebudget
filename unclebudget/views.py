@@ -53,11 +53,28 @@ def summary(request):
     accounts_balance = sum([account.balance for account in accounts])
     envelopes_balance = sum([envelope.balance for envelope in envelopes])
 
+    initial_difference = sum([
+        account.initial_balance
+        for account in Account.objects.filter(user=request.user)
+    ]) - sum([
+        envelope.initial_balance
+        for envelope in Envelope.objects.filter(user=request.user)
+    ])
+
+    # TODO we use this here and on receipt page; maybe we should figure
+    # out a better way to handle it
+    to_process = Receipt.objects.filter(
+        ~Q(balance=0),
+        user=request.user,
+    ).order_by('date')
+
     return render(request, 'unclebudget/summary.html', {
         'accounts': accounts,
         'accounts_balance': accounts_balance,
         'envelopes': envelopes,
         'envelopes_balance': envelopes_balance,
+        'initial_difference': initial_difference,
+        'to_process': to_process,
     })
 
 
