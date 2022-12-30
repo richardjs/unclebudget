@@ -16,7 +16,7 @@ def load(file):
         entries.append(Entry(
             amount = -Decimal(row['Amount']),
             date = datetime.strptime(row['Date'], '%m/%d/%Y').date(),
-            description = row['Description'],
+            description = row['Description'].strip(),
         ))
 
     return entries

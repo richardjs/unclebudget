@@ -11,7 +11,7 @@ def load(file):
         entries.append(Entry(
             amount = Decimal(row['Amount']),
             date = datetime.strptime(row['Transaction Date'], '%Y-%m-%d').date(),
-            description = row['Transaction Detail'],
+            description = row['Transaction Detail'].strip(),
         ))
 
     return entries
