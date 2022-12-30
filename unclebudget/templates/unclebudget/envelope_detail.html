@@ -20,7 +20,7 @@
                 <tr>
                     <td>${{ item.amount|intcomma }}</td>
                     <td>{{ item.description }}</td>
-                    <td>
+                    <td class="entry-description">
                         <a href="{% url 'receipt' item.receipt.id %}">
                             {{ item.receipt.description }}
                         </a>

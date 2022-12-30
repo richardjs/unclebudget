@@ -29,7 +29,7 @@
                 <tr>
                     <td><a href="{% url "account-detail" entry.account.id %}">{{ entry.account.name }}</a></td>
                     <td>${{ entry.amount|intcomma }}</td>
-                    <td>{{ entry.description }}</td>
+                    <td class="entry-description">{{ entry.description }}</td>
                 </tr>
             {% endfor %}
         </table>
