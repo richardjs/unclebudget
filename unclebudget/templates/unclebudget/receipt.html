@@ -27,7 +27,7 @@
 
             {% for entry in receipt.entry_set.all %}
                 <tr>
-                    <td>{{ entry.account.name }}</td>
+                    <td><a href="{% url "account-detail" entry.account.id %}">{{ entry.account.name }}</a></td>
                     <td>${{ entry.amount|intcomma }}</td>
                     <td>{{ entry.description }}</td>
                 </tr>
