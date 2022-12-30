@@ -123,7 +123,7 @@ def receipt(request, pk):
             item.user = request.user
             item.save()
 
-        if receipt.balance == 0:
+        if 'quick-advance' in request.POST and receipt.balance == 0:
             return redirect(reverse('process'))
 
     accounts = Account.objects.filter(user=request.user)
