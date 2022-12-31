@@ -17,4 +17,3 @@ RUN pip install --user -r requirements.txt gunicorn
 COPY --chown=unclebudget:unclebudget . .
 
 CMD ["sh", "docker-entrypoint.sh"]
-EXPOSE 8000
