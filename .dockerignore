@@ -1,6 +1,6 @@
 *
 
-!docker-entrypoint.sh
+!deploy/docker-entrypoint.sh
 !loaders
 !manage.py
 !project

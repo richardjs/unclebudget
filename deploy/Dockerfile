@@ -14,6 +14,7 @@ WORKDIR /opt/unclebudget
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt gunicorn
 
+COPY --chown=unclebudget:unclebudget deploy/docker-entrypoint.sh .
 COPY --chown=unclebudget:unclebudget . .
 
 CMD ["sh", "docker-entrypoint.sh"]
