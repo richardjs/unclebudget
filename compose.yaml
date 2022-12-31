@@ -1,0 +1,28 @@
+services:
+  unclebudget:
+    build:
+      context: .
+    env_file: env
+    environment:
+      UNCLEBUDGET_DB_FILE: /opt/unclebudget/data/db.sqlite3
+    volumes:
+      - unclebudget-data:/opt/unclebudget/data
+      - unclebudget-static:/opt/unclebudget/www
+
+  nginx:
+    image: nginx
+    env_file: env
+    # Unset env vars not needed by nginx
+    environment:
+      UNCLEBUDGET_DB_FILE:
+      UNCLEBUDGET_SECRET_KEY:
+      UNCLEBUDGET_TIMEZONE:
+    ports:
+      - ${UNCLEBUDGET_PORTS-127.0.0.1:8000:8000}
+    volumes:
+      - unclebudget-static:/usr/share/nginx/html:ro
+
+
+volumes:
+  unclebudget-data:
+  unclebudget-static:

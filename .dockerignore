@@ -1,0 +1,8 @@
+*
+
+!docker-entrypoint.sh
+!loaders
+!manage.py
+!project
+!requirements.txt
+!unclebudget

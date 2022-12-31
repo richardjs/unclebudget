@@ -70,9 +70,10 @@ DATABASES = {
 }
 
 USE_TZ = True
-TIME_ZONE = environ.get('UNCLEBUDGET_TIMEZONE', 'UTC')
+TIME_ZONE = environ.get('UNCLEBUDGET_TIMEZONE', 'America/Chicago')
 
 STATIC_URL = 'static/'
+STATIC_ROOT = environ.get('UNCLEBUDGET_STATIC_ROOT', BASE_DIR / 'www/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
