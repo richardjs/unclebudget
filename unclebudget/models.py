@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AnonymousUser, User
-from django.db import models
+from django.db import models, transaction, NotSupportedError
 
 
 class Account(models.Model):
@@ -176,6 +176,19 @@ class Receipt(models.Model):
             self.date = self.entry_set.first().date
 
         super().save(*args, **kwargs)
+
+    def merge(self, other):
+        if self.date != other.date:
+            raise NotSupportedError('Merged receipts must have the same date')
+        with transaction.atomic():
+            for entry in other.entry_set.all():
+                entry.receipt = self
+                entry.save()
+            for item in other.item_set.all():
+                item.receipt = self
+                item.save()
+            other.delete()
+            self.save()
 
     def __str__(self):
         return f'#{self.id}'

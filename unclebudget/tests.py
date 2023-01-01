@@ -230,3 +230,25 @@ class ModelsTestCase(TestCase):
         entry.receipt = receipt
         entry.save()
         self.assertEquals(receipt.description, '2 entries')
+
+    def test_receipt_merge(self):
+        receipt1 = Receipt.objects.all()[1]
+        receipt2 = Receipt.objects.all()[2]
+
+        entry = receipt2.entry_set.first()
+        entry.date = receipt1.date
+        entry.save()
+        receipt2.date = receipt1.date
+        receipt2.save()
+
+        combined_balance = receipt1.balance + receipt2.balance
+        combined_entries_len = receipt1.entry_set.count() + receipt2.entry_set.count()
+        combined_items_len = receipt1.item_set.count() + receipt2.item_set.count()
+
+        receipt1.merge(receipt2)
+
+        self.assertEquals(receipt1.balance, combined_balance)
+        self.assertEquals(receipt1.entry_set.count(), combined_entries_len)
+        self.assertEquals(receipt1.item_set.count(), combined_items_len)
+        with self.assertRaises(Receipt.DoesNotExist):
+            Receipt.objects.get(pk=receipt2.pk)
