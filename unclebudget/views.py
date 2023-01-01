@@ -129,6 +129,13 @@ def receipt(request, pk):
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
 
+    merge_choices = Receipt.objects.filter(
+        ~Q(pk=receipt.pk),
+        ~Q(balance=0),
+        date=receipt.date,
+        user=request.user,
+    )
+
     to_process = Receipt.objects.filter(
         ~Q(balance=0),
         user=request.user,
@@ -138,6 +145,7 @@ def receipt(request, pk):
         'receipt': receipt,
         'accounts': accounts,
         'envelopes': envelopes,
+        'merge_choices': merge_choices,
         'to_process': to_process,
     })
 
