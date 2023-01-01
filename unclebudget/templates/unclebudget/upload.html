@@ -19,7 +19,7 @@
 {% for entry in entries %}
 <tr>
     <td>{{ entry }}</td>
-    <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
+    <td><a href="{% url 'entry-detail' entry.id %}">entry</a></td>
 </tr>
 {% endfor %}
 

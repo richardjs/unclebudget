@@ -52,17 +52,6 @@ class LoaderTestCase(TestCase):
         _, entries = load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 4)
 
-    def test_receipt_amounts_equals_charge_amounts(self):
-        csv = '''Transaction Date,Post Date,Transaction Detail,Amount
-2021-01-20,2021-01-20,SUPER SUSHI,10.10
-2021-01-19,2021-01-20,WAYOUT,300.20
-2021-01-19,2021-01-20,ZAXDEE,8.30
-2021-01-22,2021-01-22,GROVERS GROCERY,35.50
-2021-02-04,2021-02-04,PAYMENT,-354.10'''
-        _, entries = load_entries(self.account, csv)
-        for entry in entries:
-            self.assertEquals(entry.amount, entry.receipt.amount)
-
 
 class ModelsTestCase(TestCase):
     def setUp(self):
@@ -94,8 +83,8 @@ class ModelsTestCase(TestCase):
                 user=entry.user,
                 amount=entry.amount,
                 description=entry.description,
+                entry=entry,
                 envelope=self.envelope,
-                receipt=entry.receipt,
             )
             item.save()
 
@@ -103,64 +92,53 @@ class ModelsTestCase(TestCase):
         account = Account.objects.first()
         self.assertEquals(account.balance, Decimal('902.92'))
 
-    def test_receipts_created(self):
-        self.assertEquals(len(Receipt.objects.all()), 4)
-
     def test_receipts_balanced(self):
-        for receipt in Receipt.objects.all():
-            self.assertTrue(receipt.balanced)
+        for entry in Entry.objects.all():
+            self.assertTrue(Entry.balanced)
 
-        receipt = Receipt.objects.first()
-        item = receipt.item_set.first()
+        entry = Entry.objects.first()
+        item = entry.item_set.first()
         item.amount = item.amount + 1
         item.save()
-        self.assertFalse(receipt.balanced)
+        self.assertFalse(entry.balanced)
 
-    def test_process_receipt(self):
+    def test_process_entry(self):
         response = self.client.get(reverse('process'))
         # Everything is balanced in initial conditions
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, reverse('summary'))
 
-        # Unbalance the receipt
+        # Unbalance the entry
         item = Item.objects.first()
         item.amount = item.amount + 1
         item.save()
-        # Process URL should take you to the page for the receipt
+        # Process URL should take you to the page for the entry
         response = self.client.get(reverse('process'), follow=True)
-        self.assertEquals(response.context['receipt'], item.receipt)
+        self.assertEquals(response.context['entry'], item.entry)
 
-        # Rebalance the receipt with the web interface
-        self.client.post(reverse('receipt', kwargs={'pk': item.receipt.id}), {
+        # Rebalance the entry with the web interface
+        self.client.post(reverse('entry-detail', kwargs={'pk': item.entry.id}), {
             'item_id': item.id,
             'item_envelope': item.envelope.id,
             'item_amount': item.amount - 1,
             'item_description': '',
         })
 
-        # Receipt should be balanced now
+        # Entry should be balanced now
         response = self.client.get(reverse('process'))
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, reverse('summary'))
 
-    def test_changing_item_changes_receipt_balance(self):
+    def test_changing_item_changes_entry_balance(self):
         item = Item.objects.first()
         item.amount += 1
         item.save()
-        self.assertFalse(item.receipt.balanced)
+        self.assertFalse(item.entry.balanced)
         item.amount -= 1
         item.save()
-        self.assertTrue(item.receipt.balanced)
+        self.assertTrue(item.entry.balanced)
         item.delete()
-        self.assertFalse(item.receipt.balanced)
-
-    def test_deleting_last_entry_deletes_receipt_and_items(self):
-        entry = Entry.objects.first()
-        num_receipts = len(Receipt.objects.all())
-        num_items = len(Item.objects.all())
-        entry.delete()
-        self.assertEquals(len(Receipt.objects.all()), num_receipts - 1)
-        self.assertEquals(len(Item.objects.all()), num_items - 1)
+        self.assertFalse(item.entry.balanced)
 
     def test_load_entries_duplicates(self):
         num_entries = len(Entry.objects.all())
@@ -181,7 +159,7 @@ class ModelsTestCase(TestCase):
         load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), num_entries + 1)
 
-    def test_deleting_load_entries_deletes_entries_and_receipts(self):
+    def test_deleting_load_entries_deletes_entries(self):
         csv = '''"Date","Description","Amount"
 01/11/2021,"NEW PAYFRIEND",-30
 01/11/2021,"NEW WALLSHOP",-62.57
@@ -190,12 +168,8 @@ class ModelsTestCase(TestCase):
         load, _ = load_entries(self.account, csv)
 
         num_entries = len(Entry.objects.all())
-        num_receipts = len(Receipt.objects.all())
-
         load.delete()
-
         self.assertEquals(len(Entry.objects.all()), num_entries - 4)
-        self.assertEquals(len(Receipt.objects.all()), num_receipts - 4)
 
     def test_access_limited_to_user(self):
         User.objects.create_user(
@@ -222,33 +196,3 @@ class ModelsTestCase(TestCase):
         self.assertEquals(account.balance, Decimal('902.92'))
         account.initial_balance = 1000
         self.assertEquals(account.balance, Decimal('1902.92'))
-
-    def test_receipt_description(self):
-        receipt = Receipt.objects.first()
-        self.assertEquals(receipt.description, 'PAYFRIEND')
-        entry = Entry.objects.last()
-        entry.receipt = receipt
-        entry.save()
-        self.assertEquals(receipt.description, '2 entries')
-
-    def test_receipt_merge(self):
-        receipt1 = Receipt.objects.all()[1]
-        receipt2 = Receipt.objects.all()[2]
-
-        entry = receipt2.entry_set.first()
-        entry.date = receipt1.date
-        entry.save()
-        receipt2.date = receipt1.date
-        receipt2.save()
-
-        combined_balance = receipt1.balance + receipt2.balance
-        combined_entries_len = receipt1.entry_set.count() + receipt2.entry_set.count()
-        combined_items_len = receipt1.item_set.count() + receipt2.item_set.count()
-
-        receipt1.merge(receipt2)
-
-        self.assertEquals(receipt1.balance, combined_balance)
-        self.assertEquals(receipt1.entry_set.count(), combined_entries_len)
-        self.assertEquals(receipt1.item_set.count(), combined_items_len)
-        with self.assertRaises(Receipt.DoesNotExist):
-            Receipt.objects.get(pk=receipt2.pk)

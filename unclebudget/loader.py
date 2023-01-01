@@ -35,20 +35,19 @@ def load_entries(account, text):
             continue
 
         # Look for duplicates
-        if Entry.objects.filter(
+        duplicate = False
+        for entry in Entry.objects.filter(
             account=account,
             date=charge.date,
             description=charge.description,
-        ).exists():
+        ).all():
+            if entry.amount == charge.amount:
+                duplicate = True
+        if duplicate:
             continue
-
-        receipt = Receipt()
-        receipt.user = account.user
-        receipt.save()
 
         charge.account = account
         charge.load = load
-        charge.receipt = receipt
         charge.user = account.user
         charge.save()
 

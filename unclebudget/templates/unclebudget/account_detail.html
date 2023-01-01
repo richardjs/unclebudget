@@ -19,14 +19,12 @@
             <th>Date</th>
             <th>Amount</th>
             <th>Description</th>
-            <th>Receipt</th>
         </thead>
         {% for entry in entries %}
             <tr>
                 <td>{{ entry.date|date:"m/d/y" }}</td>
                 <td>${{ entry.amount|intcomma }}</td>
                 <td class="entry-description">{{ entry.description }}</td>
-                <td><a href="{% url 'receipt' entry.receipt.id %}">receipt</a></td>
             </tr>
         {% endfor %}
         </table>

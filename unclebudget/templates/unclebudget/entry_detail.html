@@ -1,0 +1,74 @@
+{% extends 'unclebudget/base.html' %}
+
+{% load humanize %}
+
+{% block 'title' %}Entry{% endblock %}
+
+{% block 'content' %}
+
+
+<div class="row">
+    <div class="col-8">
+        <form method="post">
+        {% csrf_token %}
+        <h1>
+            {{ entry.date }}
+            ${{ entry.amount|intcomma }}
+        </h1>
+
+        <h2>Balance: ${{ entry.balance|intcomma }}</h2>
+
+        <h2>Account entries</h2>
+
+        <table>
+            <th>Account</th>
+            <th>Amount</th>
+            <th>Description</th>
+
+            <tr>
+                <td><a href="{% url "account-detail" entry.account.id %}">{{ entry.account.name }}</a></td>
+                <td>${{ entry.amount|intcomma }}</td>
+                <td class="entry-description">{{ entry.description }}</td>
+            </tr>
+        </table>
+
+        <h2>Envelope items</h2>
+
+        <table>
+            <th>Envelope</th>
+            <th>Amount</th>
+            <th>Description</th>
+
+            {% for item in entry.item_set.all %}
+                {% include './partials/entry_item.html' %}
+            {% endfor %}
+            {% include './partials/entry_item.html' %}
+        </table>
+
+        <p>
+            <label>
+                <input type="checkbox" name="quick-advance" checked>
+                Advance to next entry if balanced
+            </label>
+        </p>
+
+        <p>
+            <input type="submit" value="Update">
+        </p>
+    </div>
+    <div class="col-4">
+        <h2>Open Entries</h2>
+        <table>
+        {% for entry in to_process %}
+            <tr>
+                <td><a href="{% url "entry-detail" entry.id %}">{{ entry.date }}</a></td>
+                <td>${{ entry.balance|intcomma }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -61,12 +61,14 @@ def summary(request):
         for envelope in Envelope.objects.filter(user=request.user)
     ])
 
-    # TODO we use this here and on receipt page; maybe we should figure
-    # out a better way to handle it
-    to_process = Receipt.objects.filter(
-        ~Q(balance=0),
-        user=request.user,
-    ).order_by('date')
+    # TODO this is a pretty heavy calculation
+    # move it more into SQL, and/or cache it
+    to_process = [
+        entry for entry in Entry.objects.filter(
+            user=request.user
+        ).order_by('date')
+        if not entry.balanced
+    ]
 
     return render(request, 'unclebudget/summary.html', {
         'accounts': accounts,
@@ -79,19 +81,21 @@ def summary(request):
 
 
 def process(request):
-    receipt = Receipt.objects.filter(
-        ~Q(balance=0),
-        user=request.user,
-    ).order_by('date').first()
+    to_process = [
+        entry for entry in Entry.objects.filter(
+            user=request.user
+        ).order_by('date')
+        if not entry.balanced
+    ]
 
-    if not receipt:
+    if not to_process:
         return redirect('summary')
 
-    return redirect('receipt', receipt.pk)
+    return redirect('entry-detail', to_process[0].pk)
 
 
-def receipt(request, pk):
-    receipt = get_object_or_404(Receipt, user=request.user, pk=pk)
+def entry_detail(request, pk):
+    entry = get_object_or_404(Entry, user=request.user, pk=pk)
 
     if request.method == 'POST':
         for item_id, envelope_id, amount, description in zip(
@@ -116,36 +120,29 @@ def receipt(request, pk):
             if amount:
                 item.amount = Decimal(amount)
             else:
-                item.amount = receipt.balance
+                item.amount = entry.balance
+
             item.description = description
+            item.entry = entry
             item.envelope = envelope
-            item.receipt = receipt
             item.user = request.user
             item.save()
 
-        if 'quick-advance' in request.POST and receipt.balance == 0:
+        if 'quick-advance' in request.POST and entry.balance == 0:
             return redirect(reverse('process'))
 
-    accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
 
-    merge_choices = Receipt.objects.filter(
-        ~Q(pk=receipt.pk),
-        ~Q(balance=0),
-        date=receipt.date,
-        user=request.user,
-    )
+    to_process = [
+        entry for entry in Entry.objects.filter(
+            user=request.user
+        ).order_by('date')
+        if not entry.balanced
+    ]
 
-    to_process = Receipt.objects.filter(
-        ~Q(balance=0),
-        user=request.user,
-    ).order_by('date')
-
-    return render(request, 'unclebudget/receipt.html', {
-        'receipt': receipt,
-        'accounts': accounts,
+    return render(request, 'unclebudget/entry_detail.html', {
+        'entry': entry,
         'envelopes': envelopes,
-        'merge_choices': merge_choices,
         'to_process': to_process,
     })
 

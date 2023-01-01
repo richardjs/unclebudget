@@ -14,16 +14,14 @@
             <thead>
                 <th>Amount</th>
                 <th>Description</th>
-                <th>Receipt</th>
+                <th>Entry</th>
             </thead>
             {% for item in envelope.item_set.all %}
                 <tr>
                     <td>${{ item.amount|intcomma }}</td>
                     <td>{{ item.description }}</td>
                     <td class="entry-description">
-                        <a href="{% url 'receipt' item.receipt.id %}">
-                            {{ item.receipt.description }}
-                        </a>
+                        {{ item.entry.description }}
                     </td>
                 </tr>
             {% endfor %}
