@@ -53,14 +53,6 @@ def summary(request):
     accounts_balance = sum([account.balance for account in accounts])
     envelopes_balance = sum([envelope.balance for envelope in envelopes])
 
-    initial_difference = sum([
-        account.initial_balance
-        for account in Account.objects.filter(user=request.user)
-    ]) - sum([
-        envelope.initial_balance
-        for envelope in Envelope.objects.filter(user=request.user)
-    ])
-
     # TODO this is a pretty heavy calculation
     # move it more into SQL, and/or cache it
     to_process = [
@@ -75,7 +67,6 @@ def summary(request):
         'accounts_balance': accounts_balance,
         'envelopes': envelopes,
         'envelopes_balance': envelopes_balance,
-        'initial_difference': initial_difference,
         'to_process': to_process,
     })
 
@@ -171,7 +162,7 @@ def upload(request):
 
 
 def toggle_theme(request):
-    settings = Settings.objects.for_user(request.user)
+    settings = UserData.objects.for_user(request.user)
     settings.dark_mode = not settings.dark_mode
     settings.save()
     return redirect(request.META.get('HTTP_REFERER', reverse('summary')))

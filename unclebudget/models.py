@@ -4,8 +4,8 @@ from django.db import models
 
 class Account(models.Model):
     name = models.TextField()
-    initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     start_date = models.DateField()
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -13,43 +13,44 @@ class Account(models.Model):
 
     @property
     def balance(self):
-        balance = self.initial_balance
-        for entry in self.entry_set.all():
-            balance -= entry.amount
-
-        return balance
+        # We could calculate this in the DB, but sqlite3 doesn't have a
+        # decimal type, so do it here instead for accuracy
+        return -sum([entry.amount for entry in self.entry_set.all()])
 
     def __str__(self):
         return f'{self.name}'
 
 
 class Entry(models.Model):
-    account = models.ForeignKey('Account', on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     date = models.DateField()
     description = models.TextField()
-    load = models.ForeignKey('Load', null=True, blank=True, on_delete=models.PROTECT)
+
+    account = models.ForeignKey('Account', on_delete=models.CASCADE)
+    load = models.ForeignKey('Load', null=True, blank=True, on_delete=models.CASCADE)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-date', '-amount']
 
     @property
     def balance(self):
-        item_amount_sum = self.item_set.aggregate(models.Sum('amount'))['amount__sum'] or 0
-        return self.amount - item_amount_sum
+        # We could calculate this in the DB, but sqlite3 doesn't have a
+        # decimal type, so do it here instead for accuracy
+        return self.amount - sum([item.amount for item in self.item_set.all()])
 
     @property
     def balanced(self):
         return self.balance == 0
 
     def __str__(self):
-        return f'{self.date} ${self.amount} {self.description}'
+        return f'{self.account.name}: {self.date} ${self.amount} {self.description}'
 
 
 class Envelope(models.Model):
     name = models.TextField()
-    initial_balance = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -57,16 +58,9 @@ class Envelope(models.Model):
 
     @property
     def balance(self):
-        balance = self.initial_balance
-        for item in self.item_set.all():
-            balance -= item.amount
-
-        return balance
-
-    def delete(self):
-        for item in self.item_set.all():
-            item.delete()
-        super().delete(*args, **kwargs)
+        # We could calculate this in the DB, but sqlite3 doesn't have a
+        # decimal type, so do it here instead for accuracy
+        return -sum([item.amount for item in self.item_set.all()])
 
     def __str__(self):
         return f'{self.name}'
@@ -75,22 +69,25 @@ class Envelope(models.Model):
 class Item(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     description = models.TextField()
-    envelope = models.ForeignKey('Envelope', on_delete=models.PROTECT)
-    entry = models.ForeignKey('Entry', on_delete=models.PROTECT)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    envelope = models.ForeignKey('Envelope', on_delete=models.CASCADE)
+    entry = models.ForeignKey('Entry', on_delete=models.CASCADE)
     tags = models.ManyToManyField('Tag')
 
-    #class Meta:
-    #    ordering = ['-date']
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-entry__date', '-amount']
 
     def __str__(self):
-        return f'{self.date} {self.amount} {self.description}'
+        return f'{self.envelope.name}: {self.date} {self.amount} {self.description}'
 
 
 class Load(models.Model):
     loader = models.TextField()
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -102,29 +99,31 @@ class Load(models.Model):
         super().delete(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.timestamp} {self.loader}'
+        return f'{self.loader}: {self.entry_set.first().account} {self.timestamp}'
 
 
-class SettingsManager(models.Manager):
+class Tag(models.Model):
+    name = models.TextField()
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class UserDataManager(models.Manager):
     def for_user(self, user):
         if user == AnonymousUser:
-            raise Settings.DoesNotExist
+            raise UserData.DoesNotExist
         try:
             settings = self.get(user=user)
-        except Settings.DoesNotExist:
-            settings = Settings()
+        except UserData.DoesNotExist:
+            settings = UserData()
             settings.user = user
             settings.save()
         return settings
 
 
-class Settings(models.Model):
+class UserData(models.Model):
     dark_mode = models.BooleanField(default=True)
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    objects = SettingsManager()
-
-
-class Tag(models.Model):
-    name = models.TextField()
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    objects = UserDataManager()

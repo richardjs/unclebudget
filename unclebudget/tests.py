@@ -18,7 +18,7 @@ class LoaderTestCase(TestCase):
 
         self.account = Account(
             name='Test', user=self.user,
-            initial_balance=0.0, start_date=datetime(1970, 1, 1).date()
+            start_date=datetime(1970, 1, 1).date()
         )
         self.account.save()
 
@@ -62,7 +62,7 @@ class ModelsTestCase(TestCase):
 
         self.account = Account(
             name='Test Account', user=self.user,
-            initial_balance=0.0, start_date=datetime(1970, 1, 1).date()
+            start_date=datetime(1970, 1, 1).date()
         )
         self.account.save()
 
@@ -188,11 +188,5 @@ class ModelsTestCase(TestCase):
         self.assertNotIn('data-bs-theme="dark"', response.content.decode())
 
     def test_no_anonymous_settings(self):
-        with self.assertRaises(Settings.DoesNotExist):
-            Settings.objects.for_user(AnonymousUser)
-
-    def test_account_initial_balance(self):
-        account = Account.objects.first()
-        self.assertEquals(account.balance, Decimal('902.92'))
-        account.initial_balance = 1000
-        self.assertEquals(account.balance, Decimal('1902.92'))
+        with self.assertRaises(UserData.DoesNotExist):
+            UserData.objects.for_user(AnonymousUser)

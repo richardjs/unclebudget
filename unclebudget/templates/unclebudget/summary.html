@@ -6,16 +6,6 @@
 
 {% block 'content' %}
 
-{% if initial_difference %}
-<div class="row">
-    <div class="col">
-        <p>Your accounts have a combined initial balance of
-        ${{ initial_difference|intcomma}} not allocated to envelope
-        initial balances.
-    </div>
-</div>
-{% endif %}
-
 {% if to_process %}
 <div class="row">
     <div class="col">
