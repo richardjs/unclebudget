@@ -80,7 +80,7 @@ class Item(models.Model):
         ordering = ['-entry__date', '-amount']
 
     def __str__(self):
-        return f'{self.envelope.name}: {self.date} {self.amount} {self.description}'
+        return f'{self.envelope.name}: {self.entry.date} ${self.amount} {self.description}'
 
 
 class Load(models.Model):

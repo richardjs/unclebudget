@@ -111,7 +111,7 @@ def entry_detail(request, pk):
             if amount:
                 item.amount = Decimal(amount)
             else:
-                item.amount = entry.balance
+                item.amount = entry.amount
 
             item.description = description
             item.entry = entry

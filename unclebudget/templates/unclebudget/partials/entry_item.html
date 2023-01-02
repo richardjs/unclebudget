@@ -4,17 +4,15 @@
     <input type="hidden" name="item_id" value="{{ item.id }}" />
     <td>
         <select name="item_envelope">
-        {% if not entry %}
-            <option value="" selected></option>
-        {% endif %}
-        {% for envelope in envelopes %}
-            <option
-                value="{{ envelope.id }}"
-                {% if envelope == item.envelope %}selected{% endif %}
-            >{{ envelope.name }}</option>
-        {% endfor %}
+            <option value="" {% if not item %}selected{% endif %}></option>
+            {% for envelope in envelopes %}
+                <option
+                    value="{{ envelope.id }}"
+                    {% if envelope == item.envelope %}selected{% endif %}
+                >{{ envelope.name }}</option>
+            {% endfor %}
         </select>
     </td>
-    <td>$<input type="number" step=".01" name="item_amount" type="number" value="{{ item.amount|intcomma }}" /></td>
+    <td>$<input type="number" step=".01" name="item_amount" type="number" value="{{ item.amount }}" /></td>
     <td><input name="item_description" value="{{ item.description }}" /></td>
 </tr>
