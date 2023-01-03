@@ -28,6 +28,59 @@ def account_detail(request, pk):
     })
 
 
+def entry_detail(request, pk):
+    entry = get_object_or_404(Entry, user=request.user, pk=pk)
+
+    if request.method == 'POST':
+        for item_id, envelope_id, amount, description in zip(
+            request.POST.getlist('item_id'),
+            request.POST.getlist('item_envelope'),
+            request.POST.getlist('item_amount'),
+            request.POST.getlist('item_description'),
+        ):
+            if not envelope_id:
+                if item_id:
+                    item = get_object_or_404(Item, pk=item_id, user=request.user)
+                    item.delete()
+                continue
+
+            envelope = get_object_or_404(Envelope, user=request.user, pk=envelope_id)
+
+            if item_id:
+                item = get_object_or_404(Item, user=request.user, pk=item_id)
+            else:
+                item = Item()
+
+            if amount:
+                item.amount = Decimal(amount)
+            else:
+                item.amount = entry.amount
+
+            item.description = description
+            item.entry = entry
+            item.envelope = envelope
+            item.user = request.user
+            item.save()
+
+        if 'quick-advance' in request.POST and entry.balance == 0:
+            return redirect(reverse('process'))
+
+    envelopes = Envelope.objects.filter(user=request.user)
+
+    to_process = [
+        entry for entry in Entry.objects.filter(
+            user=request.user
+        ).order_by('date')
+        if not entry.balanced
+    ]
+
+    return render(request, 'unclebudget/entry_detail.html', {
+        'entry': entry,
+        'envelopes': envelopes,
+        'to_process': to_process,
+    })
+
+
 def envelope_detail(request, pk):
     envelopes = Envelope.objects.filter(user=request.user)
     try:
@@ -85,57 +138,11 @@ def process(request):
     return redirect('entry-detail', to_process[0].pk)
 
 
-def entry_detail(request, pk):
-    entry = get_object_or_404(Entry, user=request.user, pk=pk)
-
-    if request.method == 'POST':
-        for item_id, envelope_id, amount, description in zip(
-            request.POST.getlist('item_id'),
-            request.POST.getlist('item_envelope'),
-            request.POST.getlist('item_amount'),
-            request.POST.getlist('item_description'),
-        ):
-            if not envelope_id:
-                if item_id:
-                    item = get_object_or_404(Item, pk=item_id, user=request.user)
-                    item.delete()
-                continue
-
-            envelope = get_object_or_404(Envelope, user=request.user, pk=envelope_id)
-
-            if item_id:
-                item = get_object_or_404(Item, user=request.user, pk=item_id)
-            else:
-                item = Item()
-
-            if amount:
-                item.amount = Decimal(amount)
-            else:
-                item.amount = entry.amount
-
-            item.description = description
-            item.entry = entry
-            item.envelope = envelope
-            item.user = request.user
-            item.save()
-
-        if 'quick-advance' in request.POST and entry.balance == 0:
-            return redirect(reverse('process'))
-
-    envelopes = Envelope.objects.filter(user=request.user)
-
-    to_process = [
-        entry for entry in Entry.objects.filter(
-            user=request.user
-        ).order_by('date')
-        if not entry.balanced
-    ]
-
-    return render(request, 'unclebudget/entry_detail.html', {
-        'entry': entry,
-        'envelopes': envelopes,
-        'to_process': to_process,
-    })
+def toggle_theme(request):
+    settings = UserData.objects.for_user(request.user)
+    settings.dark_mode = not settings.dark_mode
+    settings.save()
+    return redirect(request.META.get('HTTP_REFERER', reverse('summary')))
 
 
 def upload(request):
@@ -159,10 +166,3 @@ def upload(request):
         'entries': entries,
         'no_new_entries': no_new_entries,
     })
-
-
-def toggle_theme(request):
-    settings = UserData.objects.for_user(request.user)
-    settings.dark_mode = not settings.dark_mode
-    settings.save()
-    return redirect(request.META.get('HTTP_REFERER', reverse('summary')))
