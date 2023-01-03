@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser, User
 from django.db import models
+from django.urls import reverse
 
 
 class Account(models.Model):
@@ -16,6 +17,9 @@ class Account(models.Model):
         # We could calculate this in the DB, but sqlite3 doesn't have a
         # decimal type, so do it here instead for accuracy
         return -sum([entry.amount for entry in self.entry_set.all()])
+
+    def get_absolute_url(self):
+        return reverse('account-detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return f'{self.name}'
@@ -61,6 +65,9 @@ class Envelope(models.Model):
         # We could calculate this in the DB, but sqlite3 doesn't have a
         # decimal type, so do it here instead for accuracy
         return -sum([item.amount for item in self.item_set.all()])
+
+    def get_absolute_url(self):
+        return reverse('envelope-detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return f'{self.name}'

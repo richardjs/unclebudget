@@ -15,7 +15,7 @@
 
     {% for envelope in envelopes %}
         <tr>
-            <td><a href="{% url 'envelope-detail' envelope.id %}">{{ envelope.name }}</a></td>
+            <td><a href="{{ envelope.get_absolute_url }}">{{ envelope.name }}</a></td>
             <td>${{ envelope.balance|intcomma }}</td>
         </tr>
     {% endfor %}
