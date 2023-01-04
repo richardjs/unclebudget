@@ -1,4 +1,12 @@
+from django.conf import settings
+
 from .models import UserData
+
+
+def debug(request):
+    if settings.DEBUG:
+        return {'debug': True}
+
 
 def theme(request):
     if not request.user.is_anonymous:

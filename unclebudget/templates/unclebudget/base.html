@@ -9,6 +9,11 @@
         <link rel="stylesheet" href="{% static 'unclebudget/css/unclebudget.css' %}" />
     </head>
     <body>
+        {% if debug %}
+        <div class="debug-warning container-fluid text-bg-warning">
+            Debug enabled
+        </div>
+        {% endif %}
         <div class="container">
             <p>
                 <b class="me-3"><a href="{% url 'summary' %}">Uncle Budget</a></b>
