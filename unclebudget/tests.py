@@ -190,3 +190,12 @@ class ModelsTestCase(TestCase):
     def test_no_anonymous_settings(self):
         with self.assertRaises(UserData.DoesNotExist):
             UserData.objects.for_user(AnonymousUser)
+
+    def test_envelope_create(self):
+        response = self.client.post(reverse('envelope-create'), {
+            'name': 'Test',
+            'description': 'this is a test',
+        }, follow=True)
+        envelope = response.context['envelope']
+        self.assertEquals(envelope.name, 'Test')
+        self.assertEquals(envelope.description, 'this is a test')

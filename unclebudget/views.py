@@ -1,10 +1,12 @@
 from decimal import Decimal
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.views.generic import *
+from django.views.generic import CreateView
 
+from .forms import EnvelopeForm
 from .models import *
 from .loader import load_entries
 
@@ -95,6 +97,15 @@ def envelope_detail(request, pk):
         'envelopes': envelopes,
         'envelopes_balance': envelopes_balance,
     })
+
+
+class EnvelopeCreateView(CreateView):
+    form_class = EnvelopeForm
+    model = Envelope
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
 def summary(request):

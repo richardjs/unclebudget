@@ -1,0 +1,13 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Create Envelope{% endblock %}
+
+{% block 'content' %}
+    <h1>Create Envelope</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Submit"></p>
+    </form>
+{% endblock %}
