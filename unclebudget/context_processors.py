@@ -6,6 +6,7 @@ from .models import UserData
 def debug(request):
     if settings.DEBUG:
         return {'debug': True}
+    return {}
 
 
 def theme(request):
