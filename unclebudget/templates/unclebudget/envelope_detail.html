@@ -23,7 +23,9 @@
                     <td>${{ item.amount|intcomma }}</td>
                     <td>{{ item.description }}</td>
                     <td class="entry-description">
-                        {{ item.entry.description }}
+                        <a href="{{ item.entry.get_absolute_url }}">
+                            {{ item.entry.description }}
+                        </a>
                     </td>
                 </tr>
             {% endfor %}

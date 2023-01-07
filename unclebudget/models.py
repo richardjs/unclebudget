@@ -48,6 +48,9 @@ class Entry(models.Model):
     def balanced(self):
         return self.balance == 0
 
+    def get_absolute_url(self):
+        return reverse('entry-detail', kwargs={'pk': self.pk})
+
     def __str__(self):
         return f'{self.account.name}: {self.date} ${self.amount} {self.description}'
 
