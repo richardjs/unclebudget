@@ -92,7 +92,7 @@ class ModelsTestCase(TestCase):
         account = Account.objects.first()
         self.assertEquals(account.balance, Decimal('902.92'))
 
-    def test_receipts_balanced(self):
+    def test_entriess_balanced(self):
         for entry in Entry.objects.all():
             self.assertTrue(Entry.balanced)
 
@@ -199,3 +199,26 @@ class ModelsTestCase(TestCase):
         envelope = response.context['envelope']
         self.assertEquals(envelope.name, 'Test')
         self.assertEquals(envelope.description, 'this is a test')
+
+    def test_entry_form_autobalance(self):
+        entry = Entry(
+            user=self.user, account=self.account,
+            amount=1000, date=datetime.now(),
+        )
+        entry.save()
+        item1 = Item(
+            user=self.user, entry=entry, envelope=self.envelope,
+            amount=700,
+        )
+        item1.save()
+
+        # Create a second item with the web form, leaving the amount blank
+        self.client.post(entry.get_absolute_url(), {
+            'item_id': [item1.id, ''],
+            'item_envelope': [self.envelope.id, self.envelope.id],
+            'item_amount': [700, ''],
+            'item_description': ['', ''],
+        })
+
+        # The new item's amount should be the remainder of the entry, balancing it
+        self.assertTrue(entry.balanced)
