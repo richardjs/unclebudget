@@ -22,27 +22,27 @@ class LoaderTestCase(TestCase):
         )
         self.account.save()
 
-    def test_first_load_entrieser(self):
+    def test_first_load_entries(self):
         csv = '''"Date","Description","Amount"
 01/12/2021,"Pending: BOBS GAS",-20
 01/11/2021,"Daily Ledger Bal",,10000.00,,
 01/11/2021,"PAYFRIEND",-30
-01/11/2021,"WALLSHOP",-62.57
+01/11/2021,"WALLSHOP","-6,200.57"
 01/10/2021,"MICKEY KING",-4.51'''
         _, entries = load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 3)
 
-    def test_second_load_entrieser(self):
+    def test_second_load_entries(self):
         csv = '''Transaction Date,Post Date,Transaction Detail,Amount
 2021-01-20,2021-01-20,SUPER SUSHI,10.10
 2021-01-19,2021-01-20,WAYOUT,300.20
-2021-01-19,2021-01-20,ZAXDEE,8.30
-2021-01-22,2021-01-22,GROVERS GROCERY,35.50
+2021-01-19,2021-01-20,ZAXDEE,"8,123.30"
+2021-01-22,2021-01-22,GROVERS GROCERY,3,5.50
 2021-02-04,2021-02-04,PAYMENT,-354.10'''
         _, entries = load_entries(self.account, csv)
         self.assertEquals(len(Entry.objects.all()), 5)
 
-    def test_load_entrieser_and_dawn_of_time(self):
+    def test_load_entries_and_dawn_of_time(self):
         csv = '''Transaction Date,Post Date,Transaction Detail,Amount
 1969-12-31,2021-01-20,SUPER SUSHI,10.10
 2021-01-19,2021-01-20,WAYOUT,300.20
