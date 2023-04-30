@@ -22,6 +22,11 @@ def account_detail(request, pk):
 
     accounts_balance = sum([account.balance for account in accounts])
 
+    ongoing_balance = account.balance
+    for entry in entries:
+        entry.ongoing_balance = ongoing_balance
+        ongoing_balance += entry.amount
+
     return render(
         request,
         "unclebudget/account_detail.html",
