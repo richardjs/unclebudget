@@ -22,23 +22,27 @@ def account_detail(request, pk):
 
     accounts_balance = sum([account.balance for account in accounts])
 
-    return render(request, 'unclebudget/account_detail.html', {
-        'account': account,
-        'accounts': accounts,
-        'accounts_balance': accounts_balance,
-        'entries': entries,
-    })
+    return render(
+        request,
+        "unclebudget/account_detail.html",
+        {
+            "account": account,
+            "accounts": accounts,
+            "accounts_balance": accounts_balance,
+            "entries": entries,
+        },
+    )
 
 
 def entry_detail(request, pk):
     entry = get_object_or_404(Entry, user=request.user, pk=pk)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         for item_id, envelope_id, amount, description in zip(
-            request.POST.getlist('item_id'),
-            request.POST.getlist('item_envelope'),
-            request.POST.getlist('item_amount'),
-            request.POST.getlist('item_description'),
+            request.POST.getlist("item_id"),
+            request.POST.getlist("item_envelope"),
+            request.POST.getlist("item_amount"),
+            request.POST.getlist("item_description"),
         ):
             if not envelope_id:
                 if item_id:
@@ -64,23 +68,26 @@ def entry_detail(request, pk):
             item.user = request.user
             item.save()
 
-        if 'quick-advance' in request.POST and entry.balance == 0:
-            return redirect(reverse('process'))
+        if "quick-advance" in request.POST and entry.balance == 0:
+            return redirect(reverse("process"))
 
     envelopes = Envelope.objects.filter(user=request.user)
 
     to_process = [
-        entry for entry in Entry.objects.filter(
-            user=request.user
-        ).order_by('date')
+        entry
+        for entry in Entry.objects.filter(user=request.user).order_by("date")
         if not entry.balanced
     ]
 
-    return render(request, 'unclebudget/entry_detail.html', {
-        'entry': entry,
-        'envelopes': envelopes,
-        'to_process': to_process,
-    })
+    return render(
+        request,
+        "unclebudget/entry_detail.html",
+        {
+            "entry": entry,
+            "envelopes": envelopes,
+            "to_process": to_process,
+        },
+    )
 
 
 def envelope_detail(request, pk):
@@ -92,11 +99,15 @@ def envelope_detail(request, pk):
 
     envelopes_balance = sum([envelope.balance for envelope in envelopes])
 
-    return render(request, 'unclebudget/envelope_detail.html', {
-        'envelope': envelope,
-        'envelopes': envelopes,
-        'envelopes_balance': envelopes_balance,
-    })
+    return render(
+        request,
+        "unclebudget/envelope_detail.html",
+        {
+            "envelope": envelope,
+            "envelopes": envelopes,
+            "envelopes_balance": envelopes_balance,
+        },
+    )
 
 
 class EnvelopeCreateView(CreateView):
@@ -120,49 +131,53 @@ def summary(request):
     # TODO this is a pretty heavy calculation
     # move it more into SQL, and/or cache it
     to_process = [
-        entry for entry in Entry.objects.filter(
-            user=request.user
-        ).order_by('date')
+        entry
+        for entry in Entry.objects.filter(user=request.user).order_by("date")
         if not entry.balanced
     ]
 
-    return render(request, 'unclebudget/summary.html', {
-        'accounts': accounts,
-        'accounts_balance': accounts_balance,
-        'envelopes': envelopes,
-        'envelopes_balance': envelopes_balance,
-        'to_process': to_process,
-    })
+    return render(
+        request,
+        "unclebudget/summary.html",
+        {
+            "accounts": accounts,
+            "accounts_balance": accounts_balance,
+            "envelopes": envelopes,
+            "envelopes_balance": envelopes_balance,
+            "to_process": to_process,
+        },
+    )
 
 
 def process(request):
     to_process = [
-        entry for entry in Entry.objects.filter(
-            user=request.user
-        ).order_by('date')
+        entry
+        for entry in Entry.objects.filter(user=request.user).order_by("date")
         if not entry.balanced
     ]
 
     if not to_process:
-        return redirect('summary')
+        return redirect("summary")
 
-    return redirect('entry-detail', to_process[0].pk)
+    return redirect("entry-detail", to_process[0].pk)
 
 
 def toggle_theme(request):
     settings = UserData.objects.for_user(request.user)
     settings.dark_mode = not settings.dark_mode
     settings.save()
-    return redirect(request.META.get('HTTP_REFERER', reverse('summary')))
+    return redirect(request.META.get("HTTP_REFERER", reverse("summary")))
 
 
 def upload(request):
     entries = None
     no_new_entries = False
 
-    if request.method == 'POST':
-        account = get_object_or_404(Account, user=request.user, pk=request.POST['account'])
-        text = request.FILES['csv'].read()
+    if request.method == "POST":
+        account = get_object_or_404(
+            Account, user=request.user, pk=request.POST["account"]
+        )
+        text = request.FILES["csv"].read()
         load, entries = load_entries(account, text)
         if not entries:
             no_new_entries = True
@@ -171,9 +186,13 @@ def upload(request):
     accounts = Account.objects.filter(user=request.user)
     loads = Load.objects.filter(user=request.user)
 
-    return render(request, 'unclebudget/upload.html', {
-        'accounts': accounts,
-        'loads': loads,
-        'entries': entries,
-        'no_new_entries': no_new_entries,
-    })
+    return render(
+        request,
+        "unclebudget/upload.html",
+        {
+            "accounts": accounts,
+            "loads": loads,
+            "entries": entries,
+            "no_new_entries": no_new_entries,
+        },
+    )

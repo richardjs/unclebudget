@@ -10,7 +10,7 @@ class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     @property
     def balance(self):
@@ -19,10 +19,10 @@ class Account(models.Model):
         return -sum([entry.amount for entry in self.entry_set.all()])
 
     def get_absolute_url(self):
-        return reverse('account-detail', kwargs={'pk': self.pk})
+        return reverse("account-detail", kwargs={"pk": self.pk})
 
     def __str__(self):
-        return f'{self.name}'
+        return f"{self.name}"
 
 
 class Entry(models.Model):
@@ -30,13 +30,13 @@ class Entry(models.Model):
     date = models.DateField()
     description = models.TextField()
 
-    account = models.ForeignKey('Account', on_delete=models.CASCADE)
-    load = models.ForeignKey('Load', null=True, blank=True, on_delete=models.CASCADE)
+    account = models.ForeignKey("Account", on_delete=models.CASCADE)
+    load = models.ForeignKey("Load", null=True, blank=True, on_delete=models.CASCADE)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-date', '-amount']
+        ordering = ["-date", "-amount"]
 
     @property
     def balance(self):
@@ -49,10 +49,10 @@ class Entry(models.Model):
         return self.balance == 0
 
     def get_absolute_url(self):
-        return reverse('entry-detail', kwargs={'pk': self.pk})
+        return reverse("entry-detail", kwargs={"pk": self.pk})
 
     def __str__(self):
-        return f'{self.account.name}: {self.date} ${self.amount} {self.description}'
+        return f"{self.account.name}: {self.date} ${self.amount} {self.description}"
 
 
 class Envelope(models.Model):
@@ -62,7 +62,7 @@ class Envelope(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     @property
     def balance(self):
@@ -71,27 +71,29 @@ class Envelope(models.Model):
         return -sum([item.amount for item in self.item_set.all()])
 
     def get_absolute_url(self):
-        return reverse('envelope-detail', kwargs={'pk': self.pk})
+        return reverse("envelope-detail", kwargs={"pk": self.pk})
 
     def __str__(self):
-        return f'{self.name}'
+        return f"{self.name}"
 
 
 class Item(models.Model):
     amount = models.DecimalField(max_digits=9, decimal_places=2)
     description = models.TextField()
 
-    envelope = models.ForeignKey('Envelope', on_delete=models.CASCADE)
-    entry = models.ForeignKey('Entry', on_delete=models.CASCADE)
-    tags = models.ManyToManyField('Tag')
+    envelope = models.ForeignKey("Envelope", on_delete=models.CASCADE)
+    entry = models.ForeignKey("Entry", on_delete=models.CASCADE)
+    tags = models.ManyToManyField("Tag")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-entry__date', '-amount']
+        ordering = ["-entry__date", "-amount"]
 
     def __str__(self):
-        return f'{self.envelope.name}: {self.entry.date} ${self.amount} {self.description}'
+        return (
+            f"{self.envelope.name}: {self.entry.date} ${self.amount} {self.description}"
+        )
 
 
 class Load(models.Model):
@@ -102,7 +104,7 @@ class Load(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
 
     def delete(self, *args, **kwargs):
         for entry in self.entry_set.all():
@@ -110,7 +112,7 @@ class Load(models.Model):
         super().delete(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.loader}: {self.entry_set.first().account} {self.timestamp}'
+        return f"{self.loader}: {self.entry_set.first().account} {self.timestamp}"
 
 
 class Tag(models.Model):

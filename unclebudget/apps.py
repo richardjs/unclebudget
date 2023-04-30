@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class UnclebudgetConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'unclebudget'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "unclebudget"

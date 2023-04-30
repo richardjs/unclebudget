@@ -24,8 +24,8 @@ def load_entries(account, text):
             pass
 
     if charges == None:
-        raise LoadException(f'No loaders successful')
-    
+        raise LoadException(f"No loaders successful")
+
     load = Load(loader=loader, text=text, user=account.user)
     load.save()
 

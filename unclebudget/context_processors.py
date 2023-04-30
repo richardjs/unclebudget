@@ -5,7 +5,7 @@ from .models import UserData
 
 def debug(request):
     if settings.DEBUG:
-        return {'debug': True}
+        return {"debug": True}
     return {}
 
 
@@ -15,6 +15,6 @@ def theme(request):
     else:
         dark_mode = True
 
-    theme = 'dark' if dark_mode else 'light'
+    theme = "dark" if dark_mode else "light"
 
-    return {'theme': theme}
+    return {"theme": theme}

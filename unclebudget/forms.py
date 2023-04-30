@@ -6,8 +6,8 @@ from .models import *
 class EnvelopeForm(ModelForm):
     class Meta:
         model = Envelope
-        fields = ('name', 'description')
+        fields = ("name", "description")
         widgets = {
-            'name': TextInput(),
-            'description': TextInput(),
+            "name": TextInput(),
+            "description": TextInput(),
         }
