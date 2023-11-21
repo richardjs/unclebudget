@@ -1,8 +1,13 @@
 from decimal import Decimal
 
+from django.conf import settings
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView as auth_LoginView
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import CreateView
 
@@ -11,6 +16,19 @@ from .models import *
 from .loader import load_entries
 
 
+class LoginView(auth_LoginView):
+    """Custom LoginView used to support UNCLEBUDGET_SINGLE_USER"""
+
+    def dispatch(self, request, *args, **kwargs):
+        if settings.UNCLEBUDGET_SINGLE_USER:
+            single_user = User.objects.get(pk=settings.UNCLEBUDGET_SINGLE_USER)
+            login(request, single_user)
+            return HttpResponseRedirect(self.get_success_url())
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+@login_required
 def account_detail(request, pk):
     accounts = Account.objects.filter(user=request.user)
     try:
@@ -39,6 +57,7 @@ def account_detail(request, pk):
     )
 
 
+@login_required
 def entry_detail(request, pk):
     entry = get_object_or_404(Entry, user=request.user, pk=pk)
 
@@ -95,6 +114,7 @@ def entry_detail(request, pk):
     )
 
 
+@login_required
 def envelope_detail(request, pk):
     envelopes = Envelope.objects.filter(user=request.user)
     try:
@@ -115,7 +135,7 @@ def envelope_detail(request, pk):
     )
 
 
-class EnvelopeCreateView(CreateView):
+class EnvelopeCreateView(CreateView, LoginRequiredMixin):
     form_class = EnvelopeForm
     model = Envelope
 
@@ -124,6 +144,7 @@ class EnvelopeCreateView(CreateView):
         return super().form_valid(form)
 
 
+@login_required
 def summary(request):
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
@@ -154,6 +175,7 @@ def summary(request):
     )
 
 
+@login_required
 def process(request):
     to_process = [
         entry
@@ -167,6 +189,7 @@ def process(request):
     return redirect("entry-detail", to_process[0].pk)
 
 
+@login_required
 def toggle_theme(request):
     settings = UserData.objects.for_user(request.user)
     settings.dark_mode = not settings.dark_mode
@@ -174,6 +197,7 @@ def toggle_theme(request):
     return redirect(request.META.get("HTTP_REFERER", reverse("summary")))
 
 
+@login_required
 def upload(request):
     entries = None
     no_new_entries = False

@@ -78,7 +78,13 @@ STATIC_ROOT = environ.get("UNCLEBUDGET_STATIC_ROOT", BASE_DIR / "www/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+LOGIN_URL = "/login"
+LOGIN_REDIRECT_URL = "/"
+
 UNCLEBUDGET_LOADERS = [
     "loaders.first",
     "loaders.second",
 ]
+
+# Single user mode: automatically log in as the user with the specified ID
+UNCLEBUDGET_SINGLE_USER = environ.get("UNCLEBUDGET_SINGLE_USER", None)

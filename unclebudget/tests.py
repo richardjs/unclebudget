@@ -1,6 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 from django.urls import reverse
@@ -234,3 +235,20 @@ class ModelsTestCase(TestCase):
 
         # The new item's amount should be the remainder of the entry, balancing it
         self.assertTrue(entry.balanced)
+
+
+class LoginTestCase(TestCase):
+    def setUp(self):
+        User.objects.create_user("testuser", "testuser@example.com", "password").save()
+        self.user = User.objects.get()
+
+    def test_single_user_login(self):
+        with self.settings(UNCLEBUDGET_SINGLE_USER="1"):
+            response = self.client.get(reverse("login"))
+            # Did we automatically log in?
+            self.assertEquals(response.url, settings.LOGIN_REDIRECT_URL)
+
+        with self.settings(UNCLEBUDGET_SINGLE_USER=None):
+            response = self.client.get(reverse("login"))
+            # Did we get the login form?
+            self.assertEquals(response.status_code, 200)
