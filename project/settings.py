@@ -20,6 +20,10 @@ ALLOWED_HOSTS = []
 if environ.get("UNCLEBUDGET_HOST"):
     ALLOWED_HOSTS = [environ.get("UNCLEBUDGET_HOST")]
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -40,6 +44,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "project.urls"
 
