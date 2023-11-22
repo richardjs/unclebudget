@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "unclebudget"
+version = "0.1.0"
+description = "Envelope-based budgeting web app"
+authors = ["Richard Schneider <richard@schneiderbox.net>"]
+license = "AGPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
