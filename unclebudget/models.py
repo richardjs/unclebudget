@@ -56,9 +56,11 @@ class Entry(models.Model):
     def save(self, **kwargs):
         super().save(**kwargs)
 
+        cache.clear_account_balance(self.account)
+
         unbalanced = cache.get_unbalanced_entries(self.user)
 
-        if self.balanced:
+        if self.balanced and self in unbalanced:
             unbalanced.remove(self)
         else:
             unbalanced.add(self)
@@ -107,9 +109,11 @@ class Item(models.Model):
     def save(self, **kwargs):
         super().save(**kwargs)
 
+        cache.clear_envelope_balance(self.envelope)
+
         unbalanced = cache.get_unbalanced_entries(self.user)
 
-        if self.entry.balanced:
+        if self.entry.balanced and self.entry in unbalanced:
             unbalanced.remove(self.entry)
         else:
             unbalanced.add(self.entry)

@@ -40,9 +40,9 @@ def account_detail(request, pk):
 
     entries = account.entry_set.all()
 
-    accounts_balance = sum([account.balance for account in accounts])
+    accounts_balance = sum([cache.get_account_balance(account) for account in accounts])
 
-    ongoing_balance = account.balance
+    ongoing_balance = cache.get_account_balance(account)
     for entry in entries:
         entry.ongoing_balance = ongoing_balance
         ongoing_balance += entry.amount
@@ -120,7 +120,9 @@ def envelope_detail(request, pk):
     except Envelope.DoesNotExist:
         raise Http404()
 
-    envelopes_balance = sum([envelope.balance for envelope in envelopes])
+    envelopes_balance = sum(
+        [cache.get_envelope_balance(envelope) for envelope in envelopes]
+    )
 
     return render(
         request,
@@ -149,8 +151,10 @@ def summary(request):
 
     # TODO we should probably cache this somewhere
     # (but we also want to make sure it's actually useful data)
-    accounts_balance = sum([account.balance for account in accounts])
-    envelopes_balance = sum([envelope.balance for envelope in envelopes])
+    accounts_balance = sum([cache.get_account_balance(account) for account in accounts])
+    envelopes_balance = sum(
+        [cache.get_envelope_balance(envelope) for envelope in envelopes]
+    )
 
     to_process = cache.get_unbalanced_entries(request.user)
 
