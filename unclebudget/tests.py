@@ -6,6 +6,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 from django.urls import reverse
 
+from . import cache
 from .loader import load_entries
 from .models import *
 
@@ -235,6 +236,39 @@ class ModelsTestCase(TestCase):
 
         # The new item's amount should be the remainder of the entry, balancing it
         self.assertTrue(entry.balanced)
+
+    def test_unbalanced_entries_cache(self):
+        unbalanced = cache.get_unbalanced_entries(self.user)
+        self.assertEquals(len(unbalanced), 0)
+
+        item = Item.objects.first()
+        item.amount += 1
+        item.save()
+
+        unbalanced = cache.get_unbalanced_entries(self.user)
+        self.assertEquals(len(unbalanced), 1)
+        self.assertTrue(item.entry in unbalanced)
+
+        item.amount -= 1
+        item.save()
+
+        unbalanced = cache.get_unbalanced_entries(self.user)
+        self.assertEquals(len(unbalanced), 0)
+
+    def test_balance_caches(self):
+        account = Account.objects.first()
+        entry = account.entry_set.first()
+        item = entry.item_set.first()
+        envelope = item.envelope
+
+        self.assertEqual(account.balance, cache.get_account_balance(account))
+        self.assertEquals(envelope.balance, cache.get_envelope_balance(envelope))
+
+        item.amount += 1
+        item.save()
+
+        self.assertEqual(account.balance, cache.get_account_balance(account))
+        self.assertEquals(envelope.balance, cache.get_envelope_balance(envelope))
 
 
 class LoginTestCase(TestCase):
