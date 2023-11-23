@@ -2,6 +2,8 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.db import models
 from django.urls import reverse
 
+from . import cache
+
 
 class Account(models.Model):
     name = models.TextField()
@@ -51,6 +53,18 @@ class Entry(models.Model):
     def get_absolute_url(self):
         return reverse("entry-detail", kwargs={"pk": self.pk})
 
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        unbalanced = cache.get_unbalanced_entries(self.user)
+
+        if self.balanced:
+            unbalanced.remove(self)
+        else:
+            unbalanced.add(self)
+
+        cache.set_unbalanced_entries(self.user, unbalanced)
+
     def __str__(self):
         return f"{self.account.name}: {self.date} ${self.amount} {self.description}"
 
@@ -89,6 +103,18 @@ class Item(models.Model):
 
     class Meta:
         ordering = ["-entry__date", "-amount"]
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        unbalanced = cache.get_unbalanced_entries(self.user)
+
+        if self.entry.balanced:
+            unbalanced.remove(self.entry)
+        else:
+            unbalanced.add(self.entry)
+
+        cache.set_unbalanced_entries(self.user, unbalanced)
 
     def __str__(self):
         return (

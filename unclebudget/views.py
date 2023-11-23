@@ -1,4 +1,5 @@
 from decimal import Decimal
+from operator import attrgetter
 
 from django.conf import settings
 from django.contrib.auth import login
@@ -11,6 +12,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import CreateView
 
+from . import cache
 from .forms import EnvelopeForm
 from .models import *
 from .loader import load_entries
@@ -97,11 +99,7 @@ def entry_detail(request, pk):
 
     envelopes = Envelope.objects.filter(user=request.user)
 
-    to_process = [
-        entry
-        for entry in Entry.objects.filter(user=request.user).order_by("date")
-        if not entry.balanced
-    ]
+    to_process = cache.get_unbalanced_entries(request.user)
 
     return render(
         request,
@@ -154,13 +152,7 @@ def summary(request):
     accounts_balance = sum([account.balance for account in accounts])
     envelopes_balance = sum([envelope.balance for envelope in envelopes])
 
-    # TODO this is a pretty heavy calculation
-    # move it more into SQL, and/or cache it
-    to_process = [
-        entry
-        for entry in Entry.objects.filter(user=request.user).order_by("date")
-        if not entry.balanced
-    ]
+    to_process = cache.get_unbalanced_entries(request.user)
 
     return render(
         request,
@@ -177,11 +169,8 @@ def summary(request):
 
 @login_required
 def process(request):
-    to_process = [
-        entry
-        for entry in Entry.objects.filter(user=request.user).order_by("date")
-        if not entry.balanced
-    ]
+    to_process = list(cache.get_unbalanced_entries(request.user))
+    to_process.sort(key=attrgetter("date"))
 
     if not to_process:
         return redirect("summary")

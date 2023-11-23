@@ -86,6 +86,13 @@ STATIC_ROOT = environ.get("UNCLEBUDGET_STATIC_ROOT", BASE_DIR / "www/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "cache",
+    }
+}
+
 LOGIN_URL = "/login"
 LOGIN_REDIRECT_URL = "/"
 
