@@ -1,6 +1,9 @@
-FROM python:3.10-alpine
+FROM python:3.11-alpine
 
 ENV PATH=/home/unclebudget/.local/bin:$PATH
+
+RUN apk update && \
+    apk add poetry
 
 RUN adduser -D -u 38681 unclebudget && \
     mkdir /opt/unclebudget/ && \
@@ -11,9 +14,9 @@ RUN adduser -D -u 38681 unclebudget && \
 USER unclebudget
 WORKDIR /opt/unclebudget
 
-COPY requirements.txt .
-RUN pip install --user -r requirements.txt gunicorn
-
 COPY --chown=unclebudget:unclebudget . .
+
+RUN poetry install && \
+    poetry add gunicorn
 
 CMD ["sh", "deploy/docker-entrypoint.sh"]

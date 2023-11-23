@@ -4,5 +4,5 @@
 !loaders
 !manage.py
 !project
-!requirements.txt
+!pyproject.toml
 !unclebudget
