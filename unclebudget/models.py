@@ -74,6 +74,7 @@ class Entry(models.Model):
 class Envelope(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
+    pinned = models.BooleanField(default=False)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

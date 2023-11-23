@@ -18,18 +18,6 @@ from .models import *
 from .loader import load_entries
 
 
-class LoginView(auth_LoginView):
-    """Custom LoginView used to support UNCLEBUDGET_SINGLE_USER"""
-
-    def dispatch(self, request, *args, **kwargs):
-        if settings.UNCLEBUDGET_SINGLE_USER:
-            single_user = User.objects.get(pk=settings.UNCLEBUDGET_SINGLE_USER)
-            login(request, single_user)
-            return HttpResponseRedirect(self.get_success_url())
-
-        return super().dispatch(request, *args, **kwargs)
-
-
 @login_required
 def account_detail(request, pk):
     accounts = Account.objects.filter(user=request.user)
@@ -55,6 +43,33 @@ def account_detail(request, pk):
             "accounts": accounts,
             "accounts_balance": accounts_balance,
             "entries": entries,
+        },
+    )
+
+
+@login_required
+def all(request):
+    accounts = Account.objects.filter(user=request.user)
+    envelopes = Envelope.objects.filter(user=request.user)
+
+    # TODO we should probably cache this somewhere
+    # (but we also want to make sure it's actually useful data)
+    accounts_balance = sum([cache.get_account_balance(account) for account in accounts])
+    envelopes_balance = sum(
+        [cache.get_envelope_balance(envelope) for envelope in envelopes]
+    )
+
+    to_process = cache.get_unbalanced_entries(request.user)
+
+    return render(
+        request,
+        "unclebudget/all.html",
+        {
+            "accounts": accounts,
+            "accounts_balance": accounts_balance,
+            "envelopes": envelopes,
+            "envelopes_balance": envelopes_balance,
+            "to_process": to_process,
         },
     )
 
@@ -144,31 +159,16 @@ class EnvelopeCreateView(CreateView, LoginRequiredMixin):
         return super().form_valid(form)
 
 
-@login_required
-def summary(request):
-    accounts = Account.objects.filter(user=request.user)
-    envelopes = Envelope.objects.filter(user=request.user)
+class LoginView(auth_LoginView):
+    """Custom LoginView used to support UNCLEBUDGET_SINGLE_USER"""
 
-    # TODO we should probably cache this somewhere
-    # (but we also want to make sure it's actually useful data)
-    accounts_balance = sum([cache.get_account_balance(account) for account in accounts])
-    envelopes_balance = sum(
-        [cache.get_envelope_balance(envelope) for envelope in envelopes]
-    )
+    def dispatch(self, request, *args, **kwargs):
+        if settings.UNCLEBUDGET_SINGLE_USER:
+            single_user = User.objects.get(pk=settings.UNCLEBUDGET_SINGLE_USER)
+            login(request, single_user)
+            return HttpResponseRedirect(self.get_success_url())
 
-    to_process = cache.get_unbalanced_entries(request.user)
-
-    return render(
-        request,
-        "unclebudget/summary.html",
-        {
-            "accounts": accounts,
-            "accounts_balance": accounts_balance,
-            "envelopes": envelopes,
-            "envelopes_balance": envelopes_balance,
-            "to_process": to_process,
-        },
-    )
+        return super().dispatch(request, *args, **kwargs)
 
 
 @login_required
@@ -180,6 +180,27 @@ def process(request):
         return redirect("summary")
 
     return redirect("entry-detail", to_process[0].pk)
+
+
+@login_required
+def summary(request):
+    envelopes = Envelope.objects.filter(user=request.user)
+    pinned = envelopes.filter(user=request.user, pinned=True)
+    negative = [
+        envelope for envelope in envelopes if cache.get_envelope_balance(envelope) < 0
+    ]
+
+    to_process = cache.get_unbalanced_entries(request.user)
+
+    return render(
+        request,
+        "unclebudget/summary.html",
+        {
+            "pinned": pinned,
+            "negative": negative,
+            "to_process": to_process,
+        },
+    )
 
 
 @login_required

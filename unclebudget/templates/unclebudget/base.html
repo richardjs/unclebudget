@@ -17,7 +17,8 @@
         <div class="container">
             <p>
                 <b class="me-3"><a href="{% url 'summary' %}">Uncle Budget</a></b>
-                <a class="ms-3" href="{% url 'process' %}">Process</a> |
+                <a class="ms-3" href="{% url 'all' %}">All</a> |
+                <a href="{% url 'process' %}">Process</a> |
                 <a href="{% url 'upload' %}">Upload</a>
                 <a class="ms-3" href="/admin">Admin</a>
                 <a class="ms-3" href="{% url 'toggle-theme' %}">{% if theme == 'dark' %}light mode{% else %}dark mode{% endif %}</a>

@@ -1,0 +1,26 @@
+{% extends 'unclebudget/base.html' %}
+
+{% load humanize %}
+
+{% block 'title' %}All{% endblock %}
+
+{% block 'content' %}
+
+{% if to_process %}
+<div class="row">
+    <div class="col">
+        <p>You have {{ to_process|length }} entries to process.</p>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col">
+        {% include 'unclebudget/partials/envelope_list.html' %}
+    </div>
+    <div class="col">
+        {% include 'unclebudget/partials/account_list.html' %}
+    </div>
+</div>
+
+{% endblock %}
