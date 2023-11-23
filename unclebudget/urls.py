@@ -5,7 +5,6 @@ from unclebudget.views import *
 
 urlpatterns = [
     path("login", LoginView.as_view(), name="login"),
-
     path("", summary, name="summary"),
     path("account/<int:pk>", account_detail, name="account-detail"),
     path("entry/<int:pk>", entry_detail, name="entry-detail"),
