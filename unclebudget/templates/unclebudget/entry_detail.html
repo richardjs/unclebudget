@@ -20,7 +20,7 @@
 
         <h2>Entry</h2>
 
-        <table>
+        <table class="table table-striped">
             <th>Account</th>
             <th>Amount</th>
             <th>Description</th>
@@ -34,7 +34,7 @@
 
         <h2>Envelope items</h2>
 
-        <table>
+        <table class="table table-striped">
             <th>Envelope</th>
             <th>Amount</th>
             <th>Description</th>
@@ -58,7 +58,7 @@
     </div>
     <div class="col-4">
         <h2>Open Entries</h2>
-        <table>
+        <table class="table table-striped">
         {% for entry in to_process %}
             <tr>
                 <td><a href="{% url "entry-detail" entry.id %}">{{ entry.date }}</a></td>

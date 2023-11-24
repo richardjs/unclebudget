@@ -14,7 +14,7 @@
 
 <p>Entries created:</p>
 
-<table>
+<table class="table table-striped">
 
 {% for entry in entries %}
 <tr>
@@ -51,19 +51,19 @@
 
 <p>Loads:</p>
 
-<table>
-<th>Account</th>
-<th>Entries</th>
-<th>Timestamp</th>
-<th>Loader</th>
-{% for load in loads %}
-<tr>
-    <td>{{ load.entry_set.first.account.name }}</td>
-    <td>{{ load.entry_set.all|length }}</td>
-    <td>{{ load.timestamp }}</td>
-    <td>{{ load.loader }}</td>
-</tr>
-{% endfor %}
+<table class="table table-striped">
+    <th>Account</th>
+    <th>Entries</th>
+    <th>Timestamp</th>
+    <th>Loader</th>
+    {% for load in loads %}
+    <tr>
+        <td>{{ load.entry_set.first.account.name }}</td>
+        <td>{{ load.entry_set.all|length }}</td>
+        <td>{{ load.timestamp }}</td>
+        <td>{{ load.loader }}</td>
+    </tr>
+    {% endfor %}
 </table>
 
 {% endblock %}
