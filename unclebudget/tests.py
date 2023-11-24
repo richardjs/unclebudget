@@ -270,6 +270,15 @@ class ModelsTestCase(TestCase):
         self.assertEqual(account.balance, cache.get_account_balance(account))
         self.assertEquals(envelope.balance, cache.get_envelope_balance(envelope))
 
+    def test_item_date_cache(self):
+        item = Item.objects.first()
+        self.assertEquals(cache.get_item_date(item), item.entry.date)
+
+        item.entry.date = datetime.now()
+        item.entry.save()
+
+        self.assertEquals(cache.get_item_date(item), item.entry.date)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):

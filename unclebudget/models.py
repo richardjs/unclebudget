@@ -67,6 +67,9 @@ class Entry(models.Model):
 
         cache.set_unbalanced_entries(self.user, unbalanced)
 
+        for item in self.item_set.all():
+            cache.clear_item_date(item)
+
     def __str__(self):
         return f"{self.account.name}: {self.date} ${self.amount} {self.description}"
 
