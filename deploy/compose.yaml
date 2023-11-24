@@ -21,6 +21,7 @@ services:
     environment:
       UNCLEBUDGET_DB_FILE:
       UNCLEBUDGET_SECRET_KEY:
+      UNCLEBUDGET_SINGLE_USER:
       UNCLEBUDGET_TIMEZONE:
     ports:
       - ${UNCLEBUDGET_BIND-127.0.0.1:8000}:80
