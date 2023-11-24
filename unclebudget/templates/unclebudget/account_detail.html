@@ -32,7 +32,8 @@
         </table>
     </div>
     <div class="col-4">
-        {% include 'unclebudget/partials/account_list.html' %}
+        <h2>Accounts</h2>
+        {% include 'unclebudget/partials/balance_table.html' with objects=accounts %}
     </div>
 </div>
 

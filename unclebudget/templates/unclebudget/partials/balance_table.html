@@ -1,0 +1,22 @@
+{% load humanize %}
+
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Balance</th>
+    </thead>
+
+    {% if total_balance %}
+        <tr>
+            <td><b>Total</b></td>
+            <td><b>${{ total_balance|intcomma }}</b></td>
+        </tr>
+    {% endif %}
+
+    {% for object in objects %}
+        <tr>
+            <td><a href="{{ object.get_absolute_url }}">{{ object.name }}</a></td>
+            <td>${{ object.balance|intcomma }}</td>
+        </tr>
+    {% endfor %}
+</table>

@@ -19,37 +19,11 @@
 <div class="row">
     <div class="col">
         <h2>Pinned</h2>
-
-        <table>
-            <thead>
-                <th>Envelope</th>
-                <th>Balance</th>
-            </thead>
-
-            {% for envelope in pinned %}
-                <tr>
-                    <td><a href="{{ envelope.get_absolute_url }}">{{ envelope.name }}</a></td>
-                    <td>${{ envelope.balance|intcomma }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+        {% include 'unclebudget/partials/balance_table.html' with objects=pinned %}
     </div>
     <div class="col">
         <h2>Negative</h2>
-
-        <table>
-            <thead>
-                <th>Envelope</th>
-                <th>Balance</th>
-            </thead>
-
-            {% for envelope in negative %}
-                <tr>
-                    <td><a href="{{ envelope.get_absolute_url }}">{{ envelope.name }}</a></td>
-                    <td>${{ envelope.balance|intcomma }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+        {% include 'unclebudget/partials/balance_table.html' with objects=negative %}
     </div>
 </div>
 
