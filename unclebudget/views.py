@@ -183,6 +183,12 @@ def process(request):
 
 
 @login_required
+def report(request):
+    from django.http import HttpResponse
+    return HttpResponse(first_item)
+
+
+@login_required
 def summary(request):
     envelopes = Envelope.objects.filter(user=request.user)
     pinned = envelopes.filter(user=request.user, pinned=True)

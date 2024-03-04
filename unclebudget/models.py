@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import AnonymousUser, User
 from django.db import models
 from django.urls import reverse
@@ -169,6 +171,7 @@ class UserDataManager(models.Manager):
 
 
 class UserData(models.Model):
+    beginning_of_time = models.DateField(default=date.fromtimestamp(0))
     dark_mode = models.BooleanField(default=True)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
