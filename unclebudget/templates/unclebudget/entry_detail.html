@@ -53,8 +53,15 @@
         </p>
 
         <p>
-            <input type="submit" value="Update">
+            <input type="submit" class="btn btn-primary" value="Update">
         </p>
+        </form>
+        <form action="{% url "entry-skip" entry.id %}" method="post">
+            {% csrf_token %}
+            <p>
+                <input type="Submit" class="btn btn-secondary" value="Skip">
+            </p>
+        </form>
     </div>
     <div class="col-4">
         <h2>Open Entries</h2>
@@ -66,7 +73,6 @@
             </tr>
         {% endfor %}
         </table>
-        </form>
     </div>
 </div>
 

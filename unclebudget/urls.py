@@ -9,6 +9,7 @@ urlpatterns = [
     path("account/<int:pk>", account_detail, name="account-detail"),
     path("all", all, name="all"),
     path("entry/<int:pk>", entry_detail, name="entry-detail"),
+    path("entry/<int:pk>/skip", entry_skip, name="entry-skip"),
     path("envelope/<int:pk>", envelope_detail, name="envelope-detail"),
     path("envelope/new", EnvelopeCreateView.as_view(), name="envelope-create"),
     path("process", process, name="process"),

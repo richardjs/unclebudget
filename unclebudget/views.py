@@ -128,6 +128,13 @@ def entry_detail(request, pk):
 
 
 @login_required
+def entry_skip(request, pk):
+    entry = get_object_or_404(Entry, user=request.user, pk=pk)
+    cache.add_skipped_entry(request.user, entry)
+    return redirect(reverse("process"))
+
+
+@login_required
 def envelope_detail(request, pk):
     envelopes = Envelope.objects.filter(user=request.user)
     try:
@@ -179,6 +186,15 @@ def process(request):
     if not to_process:
         return redirect("summary")
 
+    skipped = cache.get_skipped_entries(request.user)
+    for entry in to_process:
+        if entry in skipped:
+            continue
+
+        return redirect("entry-detail", entry.pk)
+
+    # If we've skipped every entry, act like nothing is skipped
+    cache.clear_skipped_entries(request.user)
     return redirect("entry-detail", to_process[0].pk)
 
 
