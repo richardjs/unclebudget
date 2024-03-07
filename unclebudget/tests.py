@@ -280,6 +280,29 @@ class ModelsTestCase(TestCase):
 
         self.assertEquals(cache.get_item_date(item), item.entry.date)
 
+    def test_skip_entry(self):
+        # Unbalance the first two entries
+        entry1 = Entry.objects.get(pk=1)
+        item = entry1.item_set.first()
+        item.amount = item.amount + 1
+        item.save()
+
+        entry2 = Entry.objects.get(pk=2)
+        item = entry2.item_set.first()
+        item.amount = item.amount + 1
+        item.save()
+
+        response = self.client.get(reverse("process"), follow=True)
+        self.assertEquals(response.context["entry"], entry1)
+
+        self.client.post(reverse("entry-skip", kwargs={"pk": entry1.id}))
+        response = self.client.get(reverse("process"), follow=True)
+        self.assertEquals(response.context["entry"], entry2)
+
+        self.client.post(reverse("entry-skip", kwargs={"pk": entry2.id}))
+        response = self.client.get(reverse("process"), follow=True)
+        self.assertEquals(response.context["entry"], entry1)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):

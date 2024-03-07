@@ -6,6 +6,7 @@ from . import models
 ACCOUNT_BALANCE_KEY = "account:{account.pk}:balance"
 ENVELOPE_BALANCE_KEY = "envelope:{envelope.pk}:balance"
 ITEM_DATE_KEY = "item:{item.pk}:date"
+SKIPPED_ENTRIES_KEY = "user:{user.pk}:skipped_entries"
 UNBALANCED_ENTRIES_KEY = "user:{user.pk}:unbalanced_entries"
 
 
@@ -54,6 +55,29 @@ def get_item_date(item):
 
 def clear_item_date(item):
     cache_key = ITEM_DATE_KEY.format(item=item)
+    cache.delete(cache_key)
+
+
+def get_skipped_entries(user):
+    cache_key = SKIPPED_ENTRIES_KEY.format(user=user)
+    skipped = cache.get(cache_key)
+
+    if skipped == None:
+        skipped = set()
+
+    return skipped
+
+
+def add_skipped_entry(user, entry):
+    cache_key = SKIPPED_ENTRIES_KEY.format(user=user)
+    skipped = get_skipped_entries(user)
+
+    skipped.add(entry)
+    cache.set(cache_key, skipped, None)
+
+
+def clear_skipped_entries(user):
+    cache_key = SKIPPED_ENTRIES_KEY.format(user=user)
     cache.delete(cache_key)
 
 
