@@ -114,7 +114,11 @@ def entry_detail(request, pk):
 
     envelopes = Envelope.objects.filter(user=request.user)
 
-    to_process = cache.get_unbalanced_entries(request.user)
+    to_process = list(cache.get_unbalanced_entries(request.user))
+    to_process.sort(key=attrgetter("date"))
+    skipped = cache.get_skipped_entries(user=request.user)
+    while to_process[0] in skipped:
+        to_process.append(to_process.pop(0))
 
     return render(
         request,
