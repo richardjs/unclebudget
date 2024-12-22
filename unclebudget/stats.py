@@ -67,7 +67,17 @@ def envelope_mean_expenses(user):
         i = 1
         while True:
             for cmonth in range(latest_cmonth + 1 - i, latest_cmonth + 1):
-                
+                pass
+
+
+def envelope_monthly_expenses(user):
+    return {
+        envelope: {
+            cmonth: sum(expenses(items))
+            for cmonth, items in items_by_cmonth(envelope).items()
+        }
+        for envelope in Envelope.objects.filter(user=user)
+    }
 
 
 """

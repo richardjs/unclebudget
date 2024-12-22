@@ -6,10 +6,9 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 from django.urls import reverse
 
-from . import cache
+from . import cache, stats
 from .loader import load_entries
 from .models import *
-from .stats import stats
 
 
 class LoaderTestCase(TestCase):

@@ -1,0 +1,22 @@
+{% extends 'unclebudget/base.html' %}
+
+{% load humanize %}
+
+{% block 'title' %}Entry{% endblock %}
+
+{% block 'content' %}
+
+<table>
+  <th>Envelope</th>
+  {% for envelope, months in envelope_monthly_expenses.items %}
+    <tr>
+      <td>{{ envelope }}</td>
+      {% for total in months.values %}
+        <td>{{ total }}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+</table>
+
+
+{% endblock %}

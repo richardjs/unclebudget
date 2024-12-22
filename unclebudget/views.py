@@ -12,7 +12,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import CreateView
 
-from . import cache
+from . import cache, stats
 from .forms import EnvelopeForm
 from .models import *
 from .loader import load_entries
@@ -206,7 +206,9 @@ def process(request):
 @login_required
 def report(request):
     from django.http import HttpResponse
-    return HttpResponse(first_item)
+    envelope_monthly_expenses = stats.envelope_monthly_expenses(request.user)
+
+    return render(request, "unclebudget/report.html", locals())
 
 
 @login_required
