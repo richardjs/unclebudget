@@ -30,7 +30,7 @@ class LoaderTestCase(TestCase):
 01/11/2021,"WALLSHOP","-6,200.57"
 01/10/2021,"MICKEY KING",-4.51"""
         _, entries = load_entries(self.account, csv)
-        self.assertEquals(len(Entry.objects.all()), 3)
+        self.assertEqual(len(Entry.objects.all()), 3)
 
     def test_second_load_entries(self):
         csv = """Transaction Date,Post Date,Transaction Detail,Amount
@@ -40,7 +40,7 @@ class LoaderTestCase(TestCase):
 2021-01-22,2021-01-22,GROVERS GROCERY,3,5.50
 2021-02-04,2021-02-04,PAYMENT,-354.10"""
         _, entries = load_entries(self.account, csv)
-        self.assertEquals(len(Entry.objects.all()), 5)
+        self.assertEqual(len(Entry.objects.all()), 5)
 
     def test_load_entries_and_dawn_of_time(self):
         csv = """Transaction Date,Post Date,Transaction Detail,Amount
@@ -50,7 +50,7 @@ class LoaderTestCase(TestCase):
 2021-01-22,2021-01-22,GROVERS GROCERY,35.50
 2021-02-04,2021-02-04,PAYMENT,-354.10"""
         _, entries = load_entries(self.account, csv)
-        self.assertEquals(len(Entry.objects.all()), 4)
+        self.assertEqual(len(Entry.objects.all()), 4)
 
 
 class ModelsTestCase(TestCase):
@@ -89,7 +89,7 @@ class ModelsTestCase(TestCase):
 
     def test_account_balance(self):
         account = Account.objects.first()
-        self.assertEquals(account.balance, Decimal("902.92"))
+        self.assertEqual(account.balance, Decimal("902.92"))
 
     def test_entriess_balanced(self):
         for entry in Entry.objects.all():
@@ -104,8 +104,8 @@ class ModelsTestCase(TestCase):
     def test_process_entry(self):
         response = self.client.get(reverse("process"))
         # Everything is balanced in initial conditions
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse("summary"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("summary"))
 
         # Unbalance the entry
         item = Item.objects.first()
@@ -113,7 +113,7 @@ class ModelsTestCase(TestCase):
         item.save()
         # Process URL should take you to the page for the entry
         response = self.client.get(reverse("process"), follow=True)
-        self.assertEquals(response.context["entry"], item.entry)
+        self.assertEqual(response.context["entry"], item.entry)
 
         # Rebalance the entry with the web interface
         self.client.post(
@@ -128,8 +128,8 @@ class ModelsTestCase(TestCase):
 
         # Entry should be balanced now
         response = self.client.get(reverse("process"))
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse("summary"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("summary"))
 
     def test_changing_item_changes_entry_balance(self):
         item = Item.objects.first()
@@ -150,7 +150,7 @@ class ModelsTestCase(TestCase):
 01/10/2021,"MICKEY KING",-4.51
 01/9/2021,"PAYCHECK",1000.00"""
         load_entries(self.account, csv)
-        self.assertEquals(len(Entry.objects.all()), num_entries)
+        self.assertEqual(len(Entry.objects.all()), num_entries)
 
         csv = """"Date","Description","Amount"
 01/12/2021,"NEW ENTRY",-30
@@ -159,7 +159,7 @@ class ModelsTestCase(TestCase):
 01/10/2021,"MICKEY KING",-4.51
 01/9/2021,"PAYCHECK",1000.00"""
         load_entries(self.account, csv)
-        self.assertEquals(len(Entry.objects.all()), num_entries + 1)
+        self.assertEqual(len(Entry.objects.all()), num_entries + 1)
 
     def test_deleting_load_entries_deletes_entries(self):
         csv = """"Date","Description","Amount"
@@ -171,7 +171,7 @@ class ModelsTestCase(TestCase):
 
         num_entries = len(Entry.objects.all())
         load.delete()
-        self.assertEquals(len(Entry.objects.all()), num_entries - 4)
+        self.assertEqual(len(Entry.objects.all()), num_entries - 4)
 
     def test_access_limited_to_user(self):
         User.objects.create_user(
@@ -179,9 +179,9 @@ class ModelsTestCase(TestCase):
         ).save()
         self.client.login(username="testuser2", password="password")
         response = self.client.get(reverse("account-detail", kwargs={"pk": 1}))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
         response = self.client.get(reverse("envelope-detail", kwargs={"pk": 1}))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_dark_mode_toggle(self):
         response = self.client.get("/")
@@ -204,8 +204,8 @@ class ModelsTestCase(TestCase):
             follow=True,
         )
         envelope = response.context["envelope"]
-        self.assertEquals(envelope.name, "Test")
-        self.assertEquals(envelope.description, "this is a test")
+        self.assertEqual(envelope.name, "Test")
+        self.assertEqual(envelope.description, "this is a test")
 
     def test_entry_form_autobalance(self):
         entry = Entry(
@@ -239,21 +239,21 @@ class ModelsTestCase(TestCase):
 
     def test_unbalanced_entries_cache(self):
         unbalanced = cache.get_unbalanced_entries(self.user)
-        self.assertEquals(len(unbalanced), 0)
+        self.assertEqual(len(unbalanced), 0)
 
         item = Item.objects.first()
         item.amount += 1
         item.save()
 
         unbalanced = cache.get_unbalanced_entries(self.user)
-        self.assertEquals(len(unbalanced), 1)
+        self.assertEqual(len(unbalanced), 1)
         self.assertTrue(item.entry in unbalanced)
 
         item.amount -= 1
         item.save()
 
         unbalanced = cache.get_unbalanced_entries(self.user)
-        self.assertEquals(len(unbalanced), 0)
+        self.assertEqual(len(unbalanced), 0)
 
     def test_balance_caches(self):
         account = Account.objects.first()
@@ -262,22 +262,22 @@ class ModelsTestCase(TestCase):
         envelope = item.envelope
 
         self.assertEqual(account.balance, cache.get_account_balance(account))
-        self.assertEquals(envelope.balance, cache.get_envelope_balance(envelope))
+        self.assertEqual(envelope.balance, cache.get_envelope_balance(envelope))
 
         item.amount += 1
         item.save()
 
         self.assertEqual(account.balance, cache.get_account_balance(account))
-        self.assertEquals(envelope.balance, cache.get_envelope_balance(envelope))
+        self.assertEqual(envelope.balance, cache.get_envelope_balance(envelope))
 
     def test_item_date_cache(self):
         item = Item.objects.first()
-        self.assertEquals(cache.get_item_date(item), item.entry.date)
+        self.assertEqual(cache.get_item_date(item), item.entry.date)
 
         item.entry.date = datetime.now()
         item.entry.save()
 
-        self.assertEquals(cache.get_item_date(item), item.entry.date)
+        self.assertEqual(cache.get_item_date(item), item.entry.date)
 
     def test_skip_entry(self):
         # Unbalance the first two entries
@@ -292,15 +292,15 @@ class ModelsTestCase(TestCase):
         item.save()
 
         response = self.client.get(reverse("process"), follow=True)
-        self.assertEquals(response.context["entry"], entry1)
+        self.assertEqual(response.context["entry"], entry1)
 
         self.client.post(reverse("entry-skip", kwargs={"pk": entry1.id}))
         response = self.client.get(reverse("process"), follow=True)
-        self.assertEquals(response.context["entry"], entry2)
+        self.assertEqual(response.context["entry"], entry2)
 
         self.client.post(reverse("entry-skip", kwargs={"pk": entry2.id}))
         response = self.client.get(reverse("process"), follow=True)
-        self.assertEquals(response.context["entry"], entry1)
+        self.assertEqual(response.context["entry"], entry1)
 
 
 class LoginTestCase(TestCase):
@@ -312,9 +312,9 @@ class LoginTestCase(TestCase):
         with self.settings(UNCLEBUDGET_SINGLE_USER="1"):
             response = self.client.get(reverse("login"))
             # Did we automatically log in?
-            self.assertEquals(response.url, settings.LOGIN_REDIRECT_URL)
+            self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
 
         with self.settings(UNCLEBUDGET_SINGLE_USER=None):
             response = self.client.get(reverse("login"))
             # Did we get the login form?
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
