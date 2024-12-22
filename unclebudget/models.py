@@ -109,8 +109,6 @@ class Item(models.Model):
     entry = models.ForeignKey("Entry", on_delete=models.CASCADE)
     tags = models.ManyToManyField("Tag")
 
-    expected = models.BooleanField(default=False)
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
