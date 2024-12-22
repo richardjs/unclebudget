@@ -151,6 +151,12 @@ class Load(models.Model):
         return f"{self.loader}: {self.entry_set.first().account} {self.timestamp}"
 
 
+class Note(models.Model):
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
 class Tag(models.Model):
     name = models.TextField()
 
