@@ -37,6 +37,8 @@ class Entry(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE)
     load = models.ForeignKey("Load", null=True, blank=True, on_delete=models.CASCADE)
 
+    expected = models.BooleanField(default=False)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -106,6 +108,8 @@ class Item(models.Model):
     envelope = models.ForeignKey("Envelope", on_delete=models.CASCADE)
     entry = models.ForeignKey("Entry", on_delete=models.CASCADE)
     tags = models.ManyToManyField("Tag")
+
+    expected = models.BooleanField(default=False)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

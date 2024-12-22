@@ -34,6 +34,20 @@ def load_entries(account, text):
         if charge.date < account.start_date:
             continue
 
+        # Look for expected entries
+        expected = Entry.objects.filter(
+            account=account,
+            amount=charge.amount,
+            expected=True,
+        ).first()
+        if expected:
+            expected.date = charge.date
+            expected.description = charge.description
+            expected.expected = False
+            expected.load = load
+            expected.save()
+            continue
+
         # Look for duplicates
         duplicate = False
         for entry in Entry.objects.filter(

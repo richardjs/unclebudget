@@ -52,6 +52,28 @@ class LoaderTestCase(TestCase):
         _, entries = load_entries(self.account, csv)
         self.assertEqual(len(Entry.objects.all()), 4)
 
+    def test_expected_entry(self):
+        Entry(
+            amount=30,
+            date=datetime.now(),
+            description="payfriend purchase",
+            account=self.account,
+            expected=True,
+            user=self.user,
+        ).save()
+
+        csv = """"Date","Description","Amount"
+01/12/2021,"Pending: BOBS GAS",-20
+01/11/2021,"Daily Ledger Bal",,10000.00,,
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"WALLSHOP","-6,200.57"
+01/10/2021,"MICKEY KING",-4.51"""
+
+        _, entries = load_entries(self.account, csv)
+        self.assertEqual(len(Entry.objects.all()), 3)
+
+    # TODO test expected items
+
 
 class ModelsTestCase(TestCase):
     def setUp(self):

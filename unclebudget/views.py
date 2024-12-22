@@ -206,6 +206,7 @@ def process(request):
 @login_required
 def report(request):
     from django.http import HttpResponse
+
     envelope_monthly_expenses = stats.envelope_monthly_expenses(request.user)
 
     return render(request, "unclebudget/report.html", locals())
