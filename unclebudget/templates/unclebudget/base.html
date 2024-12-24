@@ -4,6 +4,7 @@
 <html {% if theme == 'dark' %}data-bs-theme="dark"{% endif %}>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Uncle Budget - {% block 'title' %}{% endblock %}</title>
         <link rel="stylesheet" href="{% static 'unclebudget/css/bootstrap.min.css' %}" />
         <link rel="stylesheet" href="{% static 'unclebudget/css/unclebudget.css' %}" />
@@ -15,14 +16,29 @@
         </div>
         {% endif %}
         <div class="container">
-            <p>
-                <b class="me-3"><a href="{% url 'summary' %}">Uncle Budget</a></b>
-                <a class="ms-3" href="{% url 'all' %}">All</a> |
-                <a href="{% url 'process' %}">Process</a> |
-                <a href="{% url 'upload' %}">Upload</a>
-                <a class="ms-3" href="/admin">Admin</a>
-                <a class="ms-3" href="{% url 'toggle-theme' %}">{% if theme == 'dark' %}light mode{% else %}dark mode{% endif %}</a>
-            </p>
+            <nav class="navbar navbar-expand bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{% url 'summary' %}">Uncle Budget</a>
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'all' %}">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'process' %}">Process</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'upload' %}">Upload</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Admin</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'toggle-theme' %}">{% if theme == 'dark' %}light mode{% else %}dark mode{% endif %}</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
             {% block 'content' %}
             {% endblock %}
         </div>
