@@ -3,7 +3,7 @@
 <tr>
     <input type="hidden" name="item_id" value="{{ item.id }}" />
     <td>
-        <select name="item_envelope">
+        <select class="form-select" name="item_envelope">
             <option value="" {% if not item %}selected{% endif %}></option>
             {% for envelope in envelopes %}
                 <option
@@ -13,6 +13,23 @@
             {% endfor %}
         </select>
     </td>
-    <td>$<input type="number" step=".01" name="item_amount" type="number" value="{{ item.amount }}" /></td>
-    <td><input name="item_description" value="{{ item.description }}" /></td>
+    <td>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input class="form-control"
+                name="item_amount"
+                value="{{ item.amount }}"
+                type="number"
+                step=".01"
+                inputmode="decimal"
+                autocomplete="off"
+            />
+        </div>
+    </td>
+    <td>
+        <input class="form-control"
+            name="item_description"
+            value="{{ item.description }}"
+        />
+    </td>
 </tr>
