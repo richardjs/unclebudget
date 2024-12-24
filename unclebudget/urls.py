@@ -11,6 +11,7 @@ urlpatterns = [
     path("entry/<int:pk>/skip", entry_skip, name="entry-skip"),
     path("envelope/<int:pk>", envelope_detail, name="envelope-detail"),
     path("envelope/new", EnvelopeCreateView.as_view(), name="envelope-create"),
+    path("expect", expect, name="expect"),
     path("login", LoginView.as_view(), name="login"),
     path("process", process, name="process"),
     path("report", report, name="report"),

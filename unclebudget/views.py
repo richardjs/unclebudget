@@ -162,6 +162,24 @@ def envelope_detail(request, pk):
     )
 
 
+@login_required
+def expect(request):
+    if request.method == "POST":
+        # TODO
+        pass
+
+    accounts = Account.objects.filter(user=request.user)
+    envelopes = Envelope.objects.filter(user=request.user)
+
+    return render(
+        request,
+        "unclebudget/expect.html",
+        {
+            "accounts": accounts,
+            "envelopes": envelopes,
+        },
+    )
+
 class EnvelopeCreateView(CreateView, LoginRequiredMixin):
     form_class = EnvelopeForm
     model = Envelope
