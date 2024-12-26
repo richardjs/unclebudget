@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from operator import attrgetter
 
@@ -8,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView as auth_LoginView
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import CreateView
 
@@ -165,8 +166,59 @@ def envelope_detail(request, pk):
 @login_required
 def expect(request):
     if request.method == "POST":
-        # TODO
-        pass
+        account = get_object_or_404(
+            Account, user=request.user, pk=request.POST["account_id"]
+        )
+
+        entry = Entry.objects.create(
+            account=account,
+            amount=Decimal(request.POST["amount"]),
+            date=datetime.now(),
+            description=request.POST["description"],
+            expected=True,
+            user=request.user,
+        )
+
+        split_amount = entry.amount
+        split_n = 0
+
+        for envelope_id, amount in zip(
+            request.POST.getlist("item_envelope"), request.POST.getlist("item_amount")
+        ):
+            if not envelope_id:
+                continue
+
+            if amount:
+                amount = Decimal(amount)
+                split_amount -= amount
+            else:
+                split_n += 1
+
+        for envelope_id, amount, description in zip(
+            request.POST.getlist("item_envelope"),
+            request.POST.getlist("item_amount"),
+            request.POST.getlist("item_description"),
+        ):
+            if not envelope_id:
+                continue
+
+            envelope = get_object_or_404(Envelope, user=request.user, pk=envelope_id)
+
+            if amount:
+                amount = Decimal(amount)
+            else:
+                # TODO what if this doesn't divide evenly?
+                amount = split_amount / split_n
+
+            Item.objects.create(
+                amount=amount,
+                description=description,
+                envelope=envelope,
+                entry=entry,
+                user=request.user,
+            )
+
+        return HttpResponse("Expected entry created!")
 
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)
@@ -179,6 +231,7 @@ def expect(request):
             "envelopes": envelopes,
         },
     )
+
 
 class EnvelopeCreateView(CreateView, LoginRequiredMixin):
     form_class = EnvelopeForm

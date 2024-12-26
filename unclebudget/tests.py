@@ -99,6 +99,12 @@ class ModelsTestCase(TestCase):
         )
         self.envelope.save()
 
+        self.envelope2 = Envelope(
+            name="Test Envelope 2",
+            user=self.user,
+        )
+        self.envelope2.save()
+
         for entry in entries:
             item = Item(
                 user=entry.user,
@@ -323,6 +329,30 @@ class ModelsTestCase(TestCase):
         self.client.post(reverse("entry-skip", kwargs={"pk": entry2.id}))
         response = self.client.get(reverse("process"), follow=True)
         self.assertEqual(response.context["entry"], entry1)
+
+    def test_create_expected(self):
+        self.client.post(
+            "/expect",
+            {
+                "account_id": self.account.id,
+                "amount": 1000,
+                "description": "test expected entry creation",
+                "item_id": ["", ""],
+                "item_envelope": [self.envelope.id, self.envelope2.id],
+                "item_amount": [700, ""],
+                "item_description": ["", ""],
+            },
+        )
+
+        expected_entry = Entry.objects.filter(expected=True)
+        self.assertEqual(len(expected_entry), 1)
+        expected_entry = expected_entry.first()
+
+        item1 = Item.objects.get(entry=expected_entry, envelope=self.envelope)
+        item2 = Item.objects.get(entry=expected_entry, envelope=self.envelope2)
+
+        self.assertEqual(item1.amount, 700)
+        self.assertEqual(item2.amount, 300)
 
 
 class LoginTestCase(TestCase):

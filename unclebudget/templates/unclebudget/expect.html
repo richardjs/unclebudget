@@ -1,6 +1,6 @@
 {% extends 'unclebudget/base.html' %}
 
-{% block 'title' %}{{ account.name }}{% endblock %}
+{% block 'title' %}Expect{% endblock %}
 
 {% block 'content' %}
 
@@ -10,10 +10,11 @@
     {% csrf_token %}
 
     <div class="mb-3">
-        <label class="form-label fs-3" for="account">Account</label>
+        <label class="form-label fs-3" for="account_id">Account</label>
         <select class="form-select form-select-lg"
-            name="account"
-            id="account"
+            name="account_id"
+            id="account_id"
+            required
         >
             <option value="" selected></endif>
             {% for account in accounts %}
@@ -36,8 +37,18 @@
                 min="0"
                 inputmode="decimal"
                 autocomplete="off"
+                required
             />
         </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fs-3" for="description">Description</label>
+        <input class="form-control form-control-lg"
+            name="description"
+            id="description"
+            required
+        />
     </div>
 
     <div class="mb-3">
@@ -49,6 +60,10 @@
 
             {% include './partials/entry_item.html' %}
         </table>
+    </div>
+
+    <div class="d-grid gap-2 d-flex justify-content-end">
+        <input type="submit" class="btn btn-lg btn-primary" value="Submit" />
     </div>
 </form>
 

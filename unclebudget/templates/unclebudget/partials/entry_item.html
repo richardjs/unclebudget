@@ -3,7 +3,10 @@
 <tr>
     <input type="hidden" name="item_id" value="{{ item.id }}" />
     <td>
-        <select class="form-select" name="item_envelope">
+        <select class="form-select"
+            name="item_envelope"
+            onchange="envelopeChange(this)"
+        >
             <option value="" {% if not item %}selected{% endif %}></option>
             {% for envelope in envelopes %}
                 <option
