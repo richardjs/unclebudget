@@ -132,6 +132,9 @@ def entry_detail(request, pk):
                 amount=to_split_amount / len(to_split_item_ids)
             )
 
+        # Save to update cache
+        entry.save()
+
         if "quick-advance" in request.POST and entry.balance == 0:
             return redirect(reverse("process"))
 
