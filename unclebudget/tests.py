@@ -380,6 +380,25 @@ class ModelsTestCase(TestCase):
         # present in the post at all
         self.assertEqual(len(entry.item_set.all()), 0)
 
+    def test_entry_form_autobalance_with_existing_balance(self):
+        entry = Entry.objects.first()
+        item = entry.item_set.first()
+        item.amount -= 10
+        item.save()
+
+        self.client.post(
+            reverse("entry-detail", kwargs={"pk": entry.id}),
+            {
+                "item_id": item.id,
+                "item_envelope": item.envelope.id,
+                "item_amount": "",
+                "item_description": "",
+            },
+        )
+
+        item.refresh_from_db()
+        self.assertEqual(item.amount, entry.amount)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):

@@ -81,6 +81,9 @@ def entry_detail(request, pk):
 
     existing_item_ids = set([item.id for item in entry.item_set.all()])
 
+    to_split_amount = entry.amount
+    to_split_item_ids = set()
+
     if request.method == "POST":
         for item_id, envelope_id, amount, description in zip(
             request.POST.getlist("item_id"),
@@ -102,22 +105,32 @@ def entry_detail(request, pk):
 
             envelope = get_object_or_404(Envelope, user=request.user, pk=envelope_id)
 
-            if amount:
-                item.amount = Decimal(amount)
-            else:
-                item.amount = entry.balance
-
             item.description = description
             item.entry = entry
             item.envelope = envelope
             item.user = request.user
+
+            if amount:
+                item.amount = Decimal(amount)
+                to_split_amount -= item.amount
+            else:
+                # Temporary amount, to be updated below
+                item.amount = 0.01
+                # Save it here so we have an ID
+                item.save()
+                to_split_item_ids.add(item.id)
+
             item.save()
 
         # If there are any existing items we didn't see in the above form
         # loop, we should delete them (because the user deleted them)
         for item_id in existing_item_ids:
-            item = Item.objects.get(pk=item_id)
-            item.delete()
+            Item.objects.get(pk=item_id).delete()
+
+        for item_id in to_split_item_ids:
+            Item.objects.filter(pk=item_id).update(
+                amount=to_split_amount / len(to_split_item_ids)
+            )
 
         if "quick-advance" in request.POST and entry.balance == 0:
             return redirect(reverse("process"))
