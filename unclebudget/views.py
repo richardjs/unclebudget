@@ -79,6 +79,8 @@ def all(request):
 def entry_detail(request, pk):
     entry = get_object_or_404(Entry, user=request.user, pk=pk)
 
+    existing_item_ids = set([item.id for item in entry.item_set.all()])
+
     if request.method == "POST":
         for item_id, envelope_id, amount, description in zip(
             request.POST.getlist("item_id"),
@@ -86,6 +88,12 @@ def entry_detail(request, pk):
             request.POST.getlist("item_amount"),
             request.POST.getlist("item_description"),
         ):
+            if item_id:
+                item = get_object_or_404(Item, user=request.user, pk=item_id)
+                existing_item_ids.remove(int(item_id))
+            else:
+                item = Item()
+
             if not envelope_id:
                 if item_id:
                     item = get_object_or_404(Item, pk=item_id, user=request.user)
@@ -93,11 +101,6 @@ def entry_detail(request, pk):
                 continue
 
             envelope = get_object_or_404(Envelope, user=request.user, pk=envelope_id)
-
-            if item_id:
-                item = get_object_or_404(Item, user=request.user, pk=item_id)
-            else:
-                item = Item()
 
             if amount:
                 item.amount = Decimal(amount)
@@ -109,6 +112,12 @@ def entry_detail(request, pk):
             item.envelope = envelope
             item.user = request.user
             item.save()
+
+        # If there are any existing items we didn't see in the above form
+        # loop, we should delete them (because the user deleted them)
+        for item_id in existing_item_ids:
+            item = Item.objects.get(pk=item_id)
+            item.delete()
 
         if "quick-advance" in request.POST and entry.balance == 0:
             return redirect(reverse("process"))

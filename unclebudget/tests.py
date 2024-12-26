@@ -354,6 +354,32 @@ class ModelsTestCase(TestCase):
         self.assertEqual(item1.amount, 700)
         self.assertEqual(item2.amount, 300)
 
+    def test_entry_form_remove_multiple_items(self):
+        entry = Entry.objects.first()
+
+        item = Item.objects.create(
+            user=entry.user,
+            amount=10,
+            description="second item",
+            entry=entry,
+            envelope=self.envelope2,
+        )
+
+        self.client.post(
+            reverse("entry-detail", kwargs={"pk": entry.id}),
+            {
+                "item_id": item.id,
+                "item_envelope": "",
+                "item_amount": item.amount,
+                "item_description": "",
+            },
+        )
+
+        # Both items should be delete--one was deleted by having a
+        # blank envelope in the above post, and the other wasn't
+        # present in the post at all
+        self.assertEqual(len(entry.item_set.all()), 0)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):
