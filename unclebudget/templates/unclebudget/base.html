@@ -8,7 +8,7 @@
         <title>Uncle Budget - {% block 'title' %}{% endblock %}</title>
 
         <link rel="stylesheet" href="{% static 'unclebudget/css/bootstrap.min.css' %}" />
-        <script src="{% static 'unclebudget/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'unclebudget/js/bootstrap.bundle.min.js' %}"></script>
 
         <link rel="stylesheet" href="{% static 'unclebudget/css/unclebudget.css' %}" />
         <script src="{% static 'unclebudget/js/unclebudget.js' %}"></script>
@@ -36,6 +36,12 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'upload' %}">Upload</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#">Reports</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'report-income' %}">Income</a></li>
+                                </ul>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/admin">Admin</a>

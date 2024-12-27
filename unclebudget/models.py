@@ -191,10 +191,22 @@ class UserData(models.Model):
     dark_mode = models.BooleanField(default=True)
 
     small_change_envelope = models.ForeignKey(
-        Envelope, on_delete=models.SET_NULL, null=True, blank=True
+        Envelope,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
     )
     small_change_threshold = models.DecimalField(
         max_digits=9, decimal_places=2, default=1.00
+    )
+
+    transfer_envelope = models.ForeignKey(
+        Envelope,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)

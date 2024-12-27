@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 from decimal import Decimal
 from operator import attrgetter
@@ -297,6 +298,35 @@ def process(request):
     # If we've skipped every entry, act like nothing is skipped
     cache.clear_skipped_entries(request.user)
     return redirect("entry-detail", to_process[0].pk)
+
+
+@login_required
+def report_income(request):
+    transfer_envelope = request.user.userdata.transfer_envelope
+
+    years = OrderedDict()
+    for entry in Entry.objects.filter(
+        user=request.user,
+        amount__lt=0,
+    ).order_by("-date"):
+        if entry.item_set.first().envelope == transfer_envelope:
+            continue
+
+        if entry.date.year not in years:
+            years[entry.date.year] = OrderedDict()
+
+        if entry.date.month not in years[entry.date.year]:
+            years[entry.date.year][entry.date.month] = []
+
+        years[entry.date.year][entry.date.month].append(entry)
+
+    return render(
+        request,
+        "unclebudget/report-income.html",
+        {
+            "years": years,
+        },
+    )
 
 
 @login_required

@@ -1,0 +1,37 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Income Report{% endblock %}
+
+{% block 'content' %}
+<h1>Income Report</h1>
+
+{% for months in years.values %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Amount</th>
+        <th scope="col">Description</th>
+        <th scope="col">Date</th>
+        <th scope="col">Account</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entries in months.values %}
+        <tr class="table-info"><td colspan="4">{{ entries.0.date|date:"F Y" }}</td></tr>
+        {% for entry in entries %}
+          <tr>
+            <td>${{ entry.amount|cut:"-" }}</td>
+            <td>
+              <a href="{% url 'entry-detail' entry.id %}">{{ entry.description }}</a>
+            </td>
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.account.name }}</td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endfor %}
+
+{% endblock %}
