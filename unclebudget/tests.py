@@ -420,6 +420,26 @@ class ModelsTestCase(TestCase):
         item.refresh_from_db()
         self.assertEqual(item.amount, entry.amount)
 
+    def test_item_sign_match_entry(self):
+        entry = Entry.objects.create(
+            account=self.account,
+            amount=-100,
+            date=datetime.now(),
+            user=self.user,
+        )
+
+        self.client.post(
+            reverse("entry-detail", kwargs={"pk": entry.id}),
+            {
+                "item_id": "",
+                "item_envelope": self.envelope.id,
+                "item_amount": "10",
+                "item_description": "",
+            },
+        )
+
+        self.assertEqual(entry.item_set.first().amount, -10)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):

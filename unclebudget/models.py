@@ -116,6 +116,12 @@ class Item(models.Model):
         ordering = ["-entry__date", "-amount"]
 
     def save(self, **kwargs):
+        # Item amount signs always match their entries
+        if (self.entry.amount > 0 and self.amount < 0) or (
+            self.entry.amount < 0 and self.amount > 0
+        ):
+            self.amount *= -1
+
         super().save(**kwargs)
 
         cache.clear_envelope_balance(self.envelope)
