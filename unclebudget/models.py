@@ -184,6 +184,13 @@ class UserData(models.Model):
     beginning_of_time = models.DateField(default=date.fromtimestamp(0))
     dark_mode = models.BooleanField(default=True)
 
+    small_change_envelope = models.ForeignKey(
+        Envelope, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    small_change_threshold = models.DecimalField(
+        max_digits=9, decimal_places=2, default=1.00
+    )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     objects = UserDataManager()

@@ -11,6 +11,8 @@ class LoadException(Exception):
 
 
 def load_entries(account, text):
+    user_data = UserData.objects.for_user(account.user)
+
     charges = None
 
     if type(text) == bytes:
@@ -64,6 +66,16 @@ def load_entries(account, text):
         charge.load = load
         charge.user = account.user
         charge.save()
+
+        # Look for small change
+        if user_data.small_change_envelope:
+            if charge.amount < user_data.small_change_threshold:
+                Item.objects.create(
+                    amount=charge.amount,
+                    envelope=user_data.small_change_envelope,
+                    entry=charge,
+                    user=account.user,
+                )
 
         entries.append(charge)
 

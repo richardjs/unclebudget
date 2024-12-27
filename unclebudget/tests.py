@@ -72,7 +72,28 @@ class LoaderTestCase(TestCase):
         _, entries = load_entries(self.account, csv)
         self.assertEqual(len(Entry.objects.all()), 3)
 
-    # TODO test expected items
+    def test_small_change(self):
+        envelope = Envelope.objects.create(
+            name="Small Change",
+            user=self.user,
+        )
+        envelope.save()
+
+        user_data = UserData.objects.for_user(self.user)
+        user_data.small_change_envelope = envelope
+        user_data.save()
+
+        csv = """"Date","Description","Amount"
+01/12/2021,"Pending: BOBS GAS",-20
+01/11/2021,"Daily Ledger Bal",,10000.00,,
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"WALLSHOP","-6,200.57"
+01/10/2021,"MICKEY KING",-0.51"""
+
+        load_entries(self.account, csv)
+
+        self.assertEqual(envelope.item_set.count(), 1)
+        self.assertEqual(envelope.item_set.first().amount, Decimal("0.51"))
 
 
 class ModelsTestCase(TestCase):
@@ -375,7 +396,7 @@ class ModelsTestCase(TestCase):
             },
         )
 
-        # Both items should be delete--one was deleted by having a
+        # Both items should be deleted--one was deleted by having a
         # blank envelope in the above post, and the other wasn't
         # present in the post at all
         self.assertEqual(len(entry.item_set.all()), 0)
