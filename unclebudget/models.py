@@ -64,8 +64,9 @@ class Entry(models.Model):
 
         unbalanced = cache.get_unbalanced_entries(self.user)
 
-        if self.balanced and self in unbalanced:
-            unbalanced.remove(self)
+        if self.balanced:
+            if self in unbalanced:
+                unbalanced.remove(self)
         else:
             unbalanced.add(self)
 
@@ -121,8 +122,9 @@ class Item(models.Model):
 
         unbalanced = cache.get_unbalanced_entries(self.user)
 
-        if self.entry.balanced and self.entry in unbalanced:
-            unbalanced.remove(self.entry)
+        if self.entry.balanced:
+            if self.entry in unbalanced:
+                unbalanced.remove(self.entry)
         else:
             unbalanced.add(self.entry)
 
