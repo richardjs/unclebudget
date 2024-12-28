@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from operator import attrgetter
 
@@ -321,6 +321,46 @@ def process(request):
     # If we've skipped every entry, act like nothing is skipped
     cache.clear_skipped_entries(request.user)
     return redirect("entry-detail", to_process[0].pk)
+
+
+@login_required
+def report_expenses_by_month(request):
+    now = datetime.now()
+
+    now_monthno = 12 * now.year + (now.month - 1)
+    start_monthno = now_monthno - 13
+    monthno_range = range(now_monthno, start_monthno - 1, -1)
+
+    start_date = date(year=start_monthno // 12, month=(start_monthno % 12) + 1, day=1)
+
+    envelopes = OrderedDict()
+    for item in Item.objects.filter(
+        user=request.user, amount__gt=0, entry__date__gte=start_date
+    ).order_by("-envelope__pinned", "envelope__name"):
+        if item.envelope == request.user.userdata.transfer_envelope:
+            continue
+
+        if item.envelope not in envelopes:
+            envelopes[item.envelope] = OrderedDict()
+            for n in monthno_range:
+                year = n // 12
+                month = (n % 12) + 1
+                envelopes[item.envelope][(year, month)] = Decimal()
+
+        envelopes[item.envelope][
+            (item.entry.date.year, item.entry.date.month)
+        ] += item.amount
+
+    return render(
+        request,
+        "unclebudget/report-expenses-by-month.html",
+        {
+            "envelopes": envelopes,
+            "month_labels": [
+                (monthno // 12, (monthno % 12) + 1) for monthno in monthno_range
+            ],
+        },
+    )
 
 
 @login_required

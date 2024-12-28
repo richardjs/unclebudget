@@ -160,6 +160,10 @@ class Item(models.Model):
         ):
             self.amount *= -1
 
+        for item in self.entry.item_set.all():
+            if item == self:
+                continue
+
         super().save(**kwargs)
 
         cache.clear_envelope_balance(self.envelope)

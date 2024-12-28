@@ -15,6 +15,11 @@ urlpatterns = [
     path("expect", expect, name="expect"),
     path("login", LoginView.as_view(), name="login"),
     path("process", process, name="process"),
+    path(
+        "report/expenses-by-month",
+        report_expenses_by_month,
+        name="report-expenses-by-month",
+    ),
     path("report/income", report_income, name="report-income"),
     path("upload", upload, name="upload"),
     path("toggle-theme", toggle_theme, name="toggle-theme"),

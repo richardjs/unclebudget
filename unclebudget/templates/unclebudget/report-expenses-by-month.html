@@ -1,0 +1,34 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Expenses By Month{% endblock %}
+
+{% block 'content' %}
+<h1>Expenses By Month</h1>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Envelope</th>
+        {% for year, month in month_labels %}
+          <th scope="col">{{ month }}/{{ year }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for envelope, months in envelopes.items %}
+        <tr>
+          <td>
+            {% if envelope.pinned %}
+              <b>{{ envelope.name }}</b>
+            {% else %}
+              {{ envelope.name }}
+            {% endif %}
+          </td>
+          {% for total in months.values %}
+            <td>${{ total|floatformat:2 }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+
+{% endblock %}
