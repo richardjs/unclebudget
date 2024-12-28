@@ -6,13 +6,11 @@
 
 {% block 'content' %}
 
-{% if to_process %}
 <div class="row">
     <div class="col">
-        <p>You have {{ to_process|length }} entries to process.</p>
+      <p class="mt-2">{% if to_process %} You have {{ to_process|length }} entries to process.{% endif %} Last update: {{ latest_date }}</p>
     </div>
 </div>
-{% endif %}
 
 <h1>Summary</h1>
 

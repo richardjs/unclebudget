@@ -422,6 +422,10 @@ def summary(request):
 
     to_process = cache.get_unbalanced_entries(request.user)
 
+    latest_entry = Entry.objects.filter(user=request.user).order_by("-date").first()
+    latest_load = Load.objects.filter(user=request.user).order_by("-timestamp").first()
+    latest_date = max(latest_entry.date, latest_load.timestamp.date())
+
     return render(
         request,
         "unclebudget/summary.html",
@@ -429,6 +433,7 @@ def summary(request):
             "pinned": pinned,
             "negative": negative,
             "to_process": to_process,
+            "latest_date": latest_date,
         },
     )
 
