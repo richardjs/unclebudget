@@ -58,7 +58,9 @@ def load_entries(account, text):
             description=charge.description,
         ).all():
             if entry.amount == charge.amount:
-                duplicate = True
+                # We assume a single CSV doesn't have duplicates
+                if entry not in entries:
+                    duplicate = True
         if duplicate:
             continue
 

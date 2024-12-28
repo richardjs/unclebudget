@@ -95,6 +95,15 @@ class LoaderTestCase(TestCase):
         self.assertEqual(envelope.item_set.count(), 1)
         self.assertEqual(envelope.item_set.first().amount, Decimal("0.51"))
 
+    def test_allow_duplicates_in_single_load(self):
+        csv = """"Date","Description","Amount"
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"WALLSHOP","-6,200.57"
+01/10/2021,"MICKEY KING",-4.51"""
+        _, entries = load_entries(self.account, csv)
+        self.assertEqual(len(Entry.objects.all()), 4)
+
 
 class ModelsTestCase(TestCase):
     def setUp(self):
