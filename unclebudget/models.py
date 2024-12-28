@@ -21,7 +21,7 @@ class Account(models.Model):
     def balance(self):
         # We could calculate this in the DB, but sqlite3 doesn't have a
         # decimal type, so do it here instead for accuracy
-        return -sum([entry.amount for entry in self.entry_set.all()])
+        return -sum([entry.amount for entry in self.entry_set.all() if not entry.expected])
 
     def get_absolute_url(self):
         return reverse("account-detail", kwargs={"pk": self.pk})
