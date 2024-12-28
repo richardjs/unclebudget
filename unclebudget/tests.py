@@ -440,6 +440,30 @@ class ModelsTestCase(TestCase):
 
         self.assertEqual(entry.item_set.first().amount, -10)
 
+    def test_envelope_transfer(self):
+        prior_balance = self.envelope.balance
+        prior_item_count = Item.objects.count()
+
+        self.envelope.transfer_income_to(self.envelope2, 300)
+
+        self.assertEqual(self.envelope.balance, prior_balance - 300)
+        self.assertEqual(self.envelope2.balance, 300)
+        # The transfer doesn't go evenly into existing items, so a new
+        # item should have been created
+        self.assertEqual(Item.objects.count(), prior_item_count + 1)
+
+    def test_envelope_transfer_above_balnce(self):
+        prior_balance = self.envelope.balance
+        prior_item_count = Item.objects.count()
+
+        self.envelope.transfer_income_to(self.envelope2, 1500)
+
+        self.assertEqual(self.envelope.balance, prior_balance - 1500)
+        self.assertEqual(self.envelope2.balance, 1500)
+        # The transfer doesn't go evenly into existing items, so a new
+        # item should have been created
+        self.assertEqual(Item.objects.count(), prior_item_count + 1)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):

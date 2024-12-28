@@ -5,6 +5,7 @@ from django.db import models
 from django.urls import reverse
 
 from . import cache
+from .exceptions import InsufficientFundsError
 
 
 class Account(models.Model):
@@ -94,6 +95,43 @@ class Envelope(models.Model):
         # We could calculate this in the DB, but sqlite3 doesn't have a
         # decimal type, so do it here instead for accuracy
         return -sum([item.amount for item in self.item_set.all()])
+
+    def transfer_income_to(self, envelope, amount):
+        # Remember that income amounts are negative
+        transfer_items = []
+        remaining_amount = amount
+        for item in self.item_set.filter(amount__lt=0).order_by("-entry__date"):
+            transfer_items.append(item)
+            remaining_amount -= -item.amount
+
+            if remaining_amount <= 0:
+                break
+
+        # TODO We may not actually need to check for this--why couldn't
+        # a transfer create a new item and have the envelope balance go
+        # negative?
+        if remaining_amount > 0:
+            raise InsufficientFundsError(
+                "Envelope does not have enough income for transfer."
+            )
+
+        remaining_amount = amount
+        for item in transfer_items:
+            if -item.amount <= remaining_amount:
+                item.envelope = envelope
+                item.save()
+                remaining_amount -= -item.amount
+
+            else:
+                item.amount -= -remaining_amount
+                item.save()
+                Item.objects.create(
+                    amount=amount,
+                    description="",
+                    envelope=envelope,
+                    entry=item.entry,
+                    user=item.user,
+                )
 
     def get_absolute_url(self):
         return reverse("envelope-detail", kwargs={"pk": self.pk})
