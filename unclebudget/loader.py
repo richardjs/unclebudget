@@ -71,7 +71,7 @@ def load_entries(account, text):
 
         # Look for small change
         if user_data.small_change_envelope:
-            if charge.amount < user_data.small_change_threshold:
+            if abs(charge.amount) < user_data.small_change_threshold:
                 Item.objects.create(
                     amount=charge.amount,
                     envelope=user_data.small_change_envelope,

@@ -95,6 +95,30 @@ class LoaderTestCase(TestCase):
         self.assertEqual(envelope.item_set.count(), 1)
         self.assertEqual(envelope.item_set.first().amount, Decimal("0.51"))
 
+    def test_small_change_abs(self):
+        envelope = Envelope.objects.create(
+            name="Small Change",
+            user=self.user,
+        )
+        envelope.save()
+
+        user_data = UserData.objects.for_user(self.user)
+        user_data.small_change_envelope = envelope
+        user_data.save()
+
+        csv = """"Date","Description","Amount"
+01/12/2021,"Pending: BOBS GAS",-20
+01/11/2021,"Daily Ledger Bal",,10000.00,,
+01/11/2021,"PAYFRIEND",-30
+01/11/2021,"WALLSHOP","-6,200.57"
+01/10/2021,"MICKEY KING",-0.51
+01/09/2021,"Test Deposit", 300"""
+
+        load_entries(self.account, csv)
+
+        self.assertEqual(envelope.item_set.count(), 1)
+        self.assertEqual(envelope.item_set.first().amount, Decimal("0.51"))
+
     def test_allow_duplicates_in_single_load(self):
         csv = """"Date","Description","Amount"
 01/11/2021,"PAYFRIEND",-30
