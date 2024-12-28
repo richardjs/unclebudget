@@ -452,16 +452,21 @@ class ModelsTestCase(TestCase):
         # item should have been created
         self.assertEqual(Item.objects.count(), prior_item_count + 1)
 
-    def test_envelope_transfer_above_balnce(self):
+    def test_envelope_transfer_form(self):
         prior_balance = self.envelope.balance
         prior_item_count = Item.objects.count()
 
-        self.envelope.transfer_income_to(self.envelope2, 1500)
+        self.client.post(
+            reverse("envelope-transfer"),
+            {
+                "from_id": self.envelope.id,
+                "amount": 10,
+                "to_id": self.envelope2.id,
+            },
+        )
 
-        self.assertEqual(self.envelope.balance, prior_balance - 1500)
-        self.assertEqual(self.envelope2.balance, 1500)
-        # The transfer doesn't go evenly into existing items, so a new
-        # item should have been created
+        self.assertEqual(self.envelope.balance, prior_balance - 10)
+        self.assertEqual(self.envelope2.balance, 10)
         self.assertEqual(Item.objects.count(), prior_item_count + 1)
 
 

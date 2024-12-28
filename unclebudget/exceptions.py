@@ -1,2 +1,2 @@
 class InsufficientFundsError(Exception):
-  pass
+    pass

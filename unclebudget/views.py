@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView as auth_LoginView
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import CreateView
 
@@ -189,6 +189,29 @@ def envelope_detail(request, pk):
     )
 
 
+def envelope_transfer(request):
+    if request.method == "POST":
+        from_envelope = Envelope.objects.get(
+            user=request.user, pk=request.POST["from_id"]
+        )
+        to_envelope = Envelope.objects.get(user=request.user, pk=request.POST["to_id"])
+        amount = Decimal(request.POST["amount"])
+
+        from_envelope.transfer_income_to(to_envelope, amount)
+
+        return redirect("summary")
+
+    envelopes = Envelope.objects.filter(user=request.user)
+
+    return render(
+        request,
+        "unclebudget/envelope_transfer.html",
+        {
+            "envelopes": envelopes,
+        },
+    )
+
+
 @login_required
 def expect(request):
     if request.method == "POST":
@@ -244,7 +267,7 @@ def expect(request):
                 user=request.user,
             )
 
-        return HttpResponse("Expected entry created!")
+        return redirect("summary")
 
     accounts = Account.objects.filter(user=request.user)
     envelopes = Envelope.objects.filter(user=request.user)

@@ -1,0 +1,52 @@
+{% extends 'unclebudget/base.html' %}
+
+{% block 'title' %}Transfer{% endblock %}
+
+{% block 'content' %}
+
+<h1>Transfer</h1>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <h2>From</h2>
+    <select class="form-select" name="from_id">
+      {% for envelope in envelopes %}
+        <option value="{{ envelope.id }}">{{ envelope.name }} (${{ envelope.balance }})</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <h2>Amount</h2>
+    <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input class="form-control"
+            name="amount"
+            value="{{ item.amount }}"
+            type="number"
+            step=".01"
+            inputmode="decimal"
+            autocomplete="off"
+            required
+        />
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <h2>To</h2>
+    <select class="form-select" name="to_id">
+      {% for envelope in envelopes %}
+        <option value="{{ envelope.id }}">{{ envelope.name }} (${{ envelope.balance }})</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+      <input type="submit" class="btn btn-primary" value="Submit">
+  </div>
+
+</form>
+
+{% endblock %}
