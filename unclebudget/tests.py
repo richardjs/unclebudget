@@ -469,6 +469,72 @@ class ModelsTestCase(TestCase):
         self.assertEqual(self.envelope2.balance, 10)
         self.assertEqual(Item.objects.count(), prior_item_count + 1)
 
+    def test_template(self):
+        Entry.objects.all().delete()
+        Item.objects.all().delete()
+
+        e = Entry.objects.create(
+            amount=-1000,
+            date=datetime.now(),
+            account=self.account,
+            user=self.user,
+        )
+
+        t = Template.objects.create(user=self.user)
+
+        TemplateItem.objects.create(
+            template=t,
+            envelope=self.envelope,
+            amount=15,
+        )
+        TemplateItem.objects.create(
+            template=t,
+            envelope=self.envelope2,
+            amount=7,
+        )
+
+        t.apply_to(e)
+
+        self.assertEqual(Item.objects.count(), 2)
+        self.assertEqual(self.envelope.balance, 15)
+        self.assertEqual(self.envelope2.balance, 7)
+
+    def test_template_form(self):
+        Entry.objects.all().delete()
+        Item.objects.all().delete()
+
+        e = Entry.objects.create(
+            amount=-1000,
+            date=datetime.now(),
+            account=self.account,
+            user=self.user,
+        )
+
+        t = Template.objects.create(user=self.user)
+
+        TemplateItem.objects.create(
+            template=t,
+            envelope=self.envelope,
+            amount=15,
+        )
+        TemplateItem.objects.create(
+            template=t,
+            envelope=self.envelope2,
+            amount=7,
+        )
+
+        self.client.post(
+            reverse("apply-template"),
+            {
+                "entry_id": e.id,
+                "template_id": t.id,
+            },
+        )
+
+        self.assertEqual(Item.objects.count(), 2)
+        self.assertEqual(self.envelope.balance, 15)
+        self.assertEqual(self.envelope2.balance, 7)
+
 
 class LoginTestCase(TestCase):
     def setUp(self):

@@ -21,7 +21,9 @@ class Account(models.Model):
     def balance(self):
         # We could calculate this in the DB, but sqlite3 doesn't have a
         # decimal type, so do it here instead for accuracy
-        return -sum([entry.amount for entry in self.entry_set.all() if not entry.expected])
+        return -sum(
+            [entry.amount for entry in self.entry_set.all() if not entry.expected]
+        )
 
     def get_absolute_url(self):
         return reverse("account-detail", kwargs={"pk": self.pk})
@@ -213,6 +215,33 @@ class Tag(models.Model):
     name = models.TextField()
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class Template(models.Model):
+    name = models.TextField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def apply_to(self, entry):
+        for item in self.templateitem_set.all():
+            Item.objects.create(
+                amount=item.amount,
+                envelope=item.envelope,
+                entry=entry,
+                user=self.user,
+            )
+
+    def __str__(self):
+        return self.name
+
+
+class TemplateItem(models.Model):
+    envelope = models.ForeignKey("Envelope", on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=9, decimal_places=2)
+
+    template = models.ForeignKey("Template", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.template} -- {self.envelope}"
 
 
 class UserDataManager(models.Manager):

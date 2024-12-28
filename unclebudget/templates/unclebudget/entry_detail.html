@@ -55,8 +55,8 @@
             </p>
         </form>
     </div>
-    {% if to_process|length  %}
-        <div class="col-3">
+    <div class="col-3">
+        {% if to_process|length  %}
             <h2>Open Entries</h2>
             <table class="table table-striped">
             {% for entry in to_process %}
@@ -66,8 +66,25 @@
                 </tr>
             {% endfor %}
             </table>
-        </div>
-    {% endif %}
+        {% endif %}
+            <h3>Templates</h3>
+            <form action="{% url "apply-template" %}" method="post">
+                {% csrf_token %}
+                    <input type="hidden" name="entry_id" value="{{ entry.id }}" />
+                    <div class="mb-3">
+                        <select class="form-select" name="template_id">
+                            {% for template in templates %}
+                                <option value="{{ template.id }}">
+                                    {{ template.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <input type="Submit" class="btn btn-primary" value="Apply">
+                    </div>
+            </form>
+    </div>
 </div>
 
 

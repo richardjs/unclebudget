@@ -77,6 +77,14 @@ def all(request):
 
 
 @login_required
+def apply_template(request):
+    template = Template.objects.get(user=request.user, pk=request.POST["template_id"])
+    entry = Entry.objects.get(user=request.user, pk=request.POST["entry_id"])
+    template.apply_to(entry)
+    return redirect(reverse("process"))
+
+
+@login_required
 def entry_detail(request, pk):
     entry = get_object_or_404(Entry, user=request.user, pk=pk)
 
@@ -148,6 +156,8 @@ def entry_detail(request, pk):
         while to_process[0] in skipped:
             to_process.append(to_process.pop(0))
 
+    templates = Template.objects.filter(user=request.user)
+
     return render(
         request,
         "unclebudget/entry_detail.html",
@@ -155,6 +165,7 @@ def entry_detail(request, pk):
             "entry": entry,
             "envelopes": envelopes,
             "to_process": to_process,
+            "templates": templates,
         },
     )
 
