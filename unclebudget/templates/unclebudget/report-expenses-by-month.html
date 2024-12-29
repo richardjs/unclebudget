@@ -1,5 +1,7 @@
 {% extends 'unclebudget/base.html' %}
 
+{% load humanize %}
+
 {% block 'title' %}Expenses By Month{% endblock %}
 
 {% block 'content' %}
@@ -24,8 +26,11 @@
               {{ envelope.name }}
             {% endif %}
           </td>
-          {% for total in months.values %}
-            <td>${{ total|floatformat:2 }}</td>
+          {% for d, total in months.items %}
+            <td>
+              <a href="{% url 'envelope_month' envelope.id d.0 d.1  %}" style="text-decoration: none;">
+                ${{ total|floatformat:2|intcomma }}
+              </a></td>
           {% endfor %}
         </tr>
       {% endfor %}

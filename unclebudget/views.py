@@ -200,6 +200,22 @@ def envelope_detail(request, pk):
     )
 
 
+@login_required
+def envelope_month(request, pk, year, month):
+    envelope = Envelope.objects.get(pk=pk)
+    items = envelope.item_set.filter(entry__date__year=year, entry__date__month=month)
+    return render(
+        request,
+        "unclebudget/envelope_item_subset.html",
+        {
+            "title": f"{ month }/{ year }",
+            "envelope": envelope,
+            "items": items,
+        },
+    )
+
+
+@login_required
 def envelope_transfer(request):
     if request.method == "POST":
         from_envelope = Envelope.objects.get(

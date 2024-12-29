@@ -11,6 +11,11 @@ urlpatterns = [
     path("entry/<int:pk>", entry_detail, name="entry-detail"),
     path("entry/<int:pk>/skip", entry_skip, name="entry-skip"),
     path("envelope/<int:pk>", envelope_detail, name="envelope-detail"),
+    path(
+        "envelope/<int:pk>/month/<int:year>/<int:month>",
+        envelope_month,
+        name="envelope_month",
+    ),
     path("envelope/new", EnvelopeCreateView.as_view(), name="envelope-create"),
     path("envelope/transfer", envelope_transfer, name="envelope-transfer"),
     path("expect", expect, name="expect"),
